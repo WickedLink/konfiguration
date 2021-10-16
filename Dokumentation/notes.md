@@ -42,9 +42,9 @@ manuelle Installation
 
 2. entsprechendes Theme in der `~/.tmux.conf` sourcen:
 
-         source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme"
+       source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme"
 
     In some linux distributions you might have to remove the quotation marks
     from the `source-file` command to avoid a `no such file or directory` error:
 
-         source-file ${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme
+       source-file ${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme
