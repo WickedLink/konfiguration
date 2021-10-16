@@ -28,3 +28,20 @@ Jede Aktion vorher mit dem Schalter `-n` testen!
 
 ## apt-get
 `apt-get moo moo moo` nettes Easteregg 😜 :stuck_out_tongue_winking_eye:
+
+## tmux
+Tmux Themepack
+
+Installation
+
+manuelle Installation
+
+1. git-repo klonen
+```
+git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
+```
+1. zwei
+        
+        git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
+        
+        
