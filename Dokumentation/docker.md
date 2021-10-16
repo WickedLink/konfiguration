@@ -6,7 +6,7 @@ mkdir -p /opt/containers/nextcloud/{database,app,daten}`
 docker-compose.yml anlegen
 ```
 cd /opt/containers/nextcloud/
-nano docker-compose.yml
+vim docker-compose.yml
 ```
 Inhalt der docker-compose.yml
 ```
@@ -85,7 +85,7 @@ docker-compose -f /opt/containers/nextcloud/docker-compose.yml up -d
 ```
 Standard Telefon Region einstellen
 ```
-nano /opt/containers/nextcloud/app/config/config.php
+vim /opt/containers/nextcloud/app/config/config.php
 ```
 folgende Zeile hinzufuegen
 ```
@@ -99,7 +99,7 @@ Die Werte `„IPAddress“:` und `„IPPrefixLen“:` sind entscheidend
 
 diese Werte in die Nextcloud config.php einfuegen
 ```
-nano /opt/containers/nextcloud/app/config/config.php
+vim /opt/containers/nextcloud/app/config/config.php
 ```
 diese Zeile einfuegen
 ```
@@ -109,3 +109,22 @@ wobei hier 172.18.1.3 `„IPAddress“:` ist
 
 und 16 `„IPPrefixLen“:`
 
+Nextcloud auf HTTPS umstellen
+```
+vim /opt/containers/nextcloud/app/config/config.php
+```
+Zeile aendern
+von
+```
+ 'overwrite.cli.url' => 'http://nextcloud.euredomain.de',
+```
+in
+```
+ 'overwrite.cli.url' => 'https://nextcloud.euredomain.de',
+```
+diese Zeilen hinzufuegen
+```
+  'overwriteprotocol' => 'https',
+  'overwritehost' => 'nextcloud.euredomain.de',
+```
+anschliessend den Container neu starten
