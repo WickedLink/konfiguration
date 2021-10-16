@@ -37,11 +37,14 @@ Installation
 manuelle Installation
 
 1. git-repo klonen
-```
-git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
-```
-1. zwei
-        
-        git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
-        
-        
+
+       git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
+
+2. entsprechendes Theme in der `~/.tmux.conf` sourcen:
+
+         source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme"
+
+    In some linux distributions you might have to remove the quotation marks
+    from the `source-file` command to avoid a `no such file or directory` error:
+
+         source-file ${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme
