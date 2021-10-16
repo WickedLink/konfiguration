@@ -1,0 +1,47 @@
+version: '3.3'
+services:
+  nextcloud3-db:
+    image: mariadb:10.4.12
+    command: --transaction-isolation=READ-COMMITTED --log-bin=ROW
+    command: --innodb_read_only_compressed=Off
+    restart: unless-stopped
+    volumes:
+      - /opt/containers/mywicked/database:/var/lib/mysql
+    environment:
+      - MYSQL_ROOT_PASSWORD=test2
+      - MYSQL_PASSWORD=test1
+      - MYSQL_DATABASE=nextcloud 
+      - MYSQL_USER=nextclouduser
+      - MYSQL_INITDB_SKIP_TZINFO=1 
+    networks:
+      - default
+  nextcloud3-app:
+    image: nextcloud:18
+#    image: nextcloud:18
+#    image: nxtcldwckd:1
+    restart: unless-stopped
+    volumes:
+      - /opt/containers/mywicked/app:/var/www/html
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.nextcloud3-app.entrypoints=http"
+      - "traefik.http.routers.nextcloud3-app.rule=Host(`your.wicked.link`)"
+      - "traefik.http.middlewares.nextcloud3-app-https-redirect.redirectscheme.scheme=https"
+      - "traefik.http.routers.nextcloud3-app.middlewares=nextcloud3-app-https-redirect"
+      - "traefik.http.routers.nextcloud3-app-secure.entrypoints=https"
+      - "traefik.http.routers.nextcloud3-app-secure.rule=Host(`your.wicked.link`)"
+      - "traefik.http.routers.nextcloud3-app-secure.tls=true"
+      - "traefik.http.routers.nextcloud3-app-secure.tls.certresolver=http"
+      - "traefik.http.routers.nextcloud3-app-secure.service=nextcloud3-app"
+      - "traefik.http.services.nextcloud3-app.loadbalancer.server.port=80"
+      - "traefik.docker.network=proxy"
+      - "traefik.http.routers.nextcloud3-app-secure.middlewares=nextcloud3-dav,secHeaders@file"
+      - "traefik.http.middlewares.nextcloud3-dav.replacepathregex.regex=^/.well-known/ca(l|rd)dav"
+      - "traefik.http.middlewares.nextcloud3-dav.replacepathregex.replacement=/remote.php/dav/"
+    networks:
+      - proxy
+      - default
+networks:
+  proxy:
+    external: true
+
