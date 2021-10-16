@@ -25,3 +25,6 @@ Jede Aktion vorher mit dem Schalter `-n` testen!
 - `stow -nvDt ~ *` delinkt Alles (hier nur simuliert)
 - `stow -vDt ~ vim` delinkt nur vim
 - `stow --adopt -nvt ~ *` alle Dateien in das Git-Verzeichnis uebertragen
+
+## apt-get
+`apt-get moo moo moo` nettes Easteregg 😜 :stuck_out_tongue_winking_eye:
