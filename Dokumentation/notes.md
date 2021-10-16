@@ -10,6 +10,8 @@ Dateien hochladen `git push`
 
 Dateien herunterladen `git pull`
 
+SSH-Key generieren `ssh-keygen -o` (wobei ich die Option -o nicht dokumentiert finde)
+
 ## stow
 Jedes angelegte Verzeichnis wie tmux, vim wird als Homeverzeichnis angesehen.
 
