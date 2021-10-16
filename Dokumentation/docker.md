@@ -97,4 +97,15 @@ docker inspect traefik
 ```
 Die Werte `„IPAddress“:` und `„IPPrefixLen“:` sind entscheidend
 
-Mit diesen beiden Werten öffnen wir nun die Nextcloud config.php.
+diese Werte in die Nextcloud config.php einfuegen
+```
+nano /opt/containers/nextcloud/app/config/config.php
+```
+diese Zeile einfuegen
+```
+'trusted_proxies' => '172.18.1.3/16',
+```
+wobei hier 172.18.1.3 `„IPAddress“:` ist
+
+und 16 `„IPPrefixLen“:`
+
