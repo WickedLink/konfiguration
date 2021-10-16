@@ -15,5 +15,5 @@ Dateien hochladen `git push`
 - n - no (nur simulieren)
 - v - verbose
 - t - targetdir
-- Mit `htop` wurde angegeben, dass nur htop verlinkt wird. Es koennen auch mehrere hintereinander angegeben werden. Soll alles verlinkt werden `stow -nvt ~ *`
-- 
+- Mit `htop` wurde angegeben, dass nur htop verlinkt wird. Es koennen auch mehrere hintereinander angegeben werden. Soll alles verlinkt werden `stow -nvt ~ *` genauso `stow -nvSt ~ *` (S fuer stow)
+- `stow -nvDt ~ *` delinkt Alles (hier nur simuliert)
