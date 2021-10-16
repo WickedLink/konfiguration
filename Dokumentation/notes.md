@@ -1,8 +1,8 @@
 ### Linux 
 ---
 
-git clone 
-git add .
-git commit -am "note"
-git push
+git clone git@github.com:WickedLink/konfiguration.git 
+git add . 
+git commit -am "note" 
+git push 
 
