@@ -15,6 +15,8 @@ SSH-Key generieren `ssh-keygen -o` (wobei ich die Option -o nicht dokumentiert f
 ## stow
 Jedes angelegte Verzeichnis wie tmux, vim wird als Homeverzeichnis angesehen.
 
+Jede Aktion vorher mit dem Schalter `-n` testen!
+
 `stow -nvt ~ htop`
 - n - no (nur simulieren)
 - v - verbose
