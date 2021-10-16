@@ -8,8 +8,10 @@ Beschreiben? `git commit -am "note"`
 
 Dateien hochladen `git push`
 
+Dateien herunterladen `git pull`
+
 ## stow
-- Jedes angelegte Verzeichnis wie tmux, vim wird als Homeverzeichnis angesehen.
+Jedes angelegte Verzeichnis wie tmux, vim wird als Homeverzeichnis angesehen.
 
 `stow -nvt ~ htop`
 - n - no (nur simulieren)
@@ -17,3 +19,4 @@ Dateien hochladen `git push`
 - t - targetdir
 - Mit `htop` wurde angegeben, dass nur htop verlinkt wird. Es koennen auch mehrere hintereinander angegeben werden. Soll alles verlinkt werden `stow -nvt ~ *` genauso `stow -nvSt ~ *` (S fuer stow)
 - `stow -nvDt ~ *` delinkt Alles (hier nur simuliert)
+- `stow -vDt ~ vim` delinkt nur vim
