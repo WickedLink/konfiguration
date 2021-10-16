@@ -40,7 +40,7 @@ manuelle Installation
 
        git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
 
-2. entsprechendes Theme in der `~/.tmux.conf` sourcen:
+2. entsprechendes Theme in der `~/.tmux.conf` sourcen: (haeh?) :confused:
 
        source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme"
 
@@ -48,3 +48,7 @@ manuelle Installation
     from the `source-file` command to avoid a `no such file or directory` error:
 
        source-file ${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme
+
+funzt:
+
+`tmux source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme`
