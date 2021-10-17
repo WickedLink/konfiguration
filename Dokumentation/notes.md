@@ -48,3 +48,5 @@ funzt: `tmux source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxth
 
 ### set the status line's colors
 `set -g status-style fg=white,bg=blue`
+
+aktuelle Einstellungen anzeigen `tmux show-options -g | grep status`
