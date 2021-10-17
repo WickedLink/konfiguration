@@ -30,31 +30,21 @@ Jede Aktion vorher mit dem Schalter `-n` testen!
 `apt-get moo moo moo` nettes Easteregg 😜 :stuck_out_tongue_winking_eye:
 
 ## tmux
-Tmux Themepack
-
-Installation
-
+### Tmux Themepack
 manuelle Installation
-
-1. git-repo klonen
-
-       git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack
-
-2. entsprechendes Theme in der `~/.tmux.conf` sourcen: (haeh?) :confused:
-
-       source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme"
+1. git-repo klonen `git clone https://github.com/jimeh/tmux-themepack.git ~/.tmux-themepack`
+2. entsprechendes Theme in der `~/.tmux.conf` sourcen: (haeh?) :confused: `source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme"`
 
     In some linux distributions you might have to remove the quotation marks
-    from the `source-file` command to avoid a `no such file or directory` error:
+    from the `source-file` command to avoid a `no such file or directory` error: `source-file ${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme`
 
-       source-file ${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme
+funzt: `tmux source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme`
 
-funzt:
-
-`tmux source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme`
-
-Key-Bindings zuruecksetzen
+### Key-Bindings zuruecksetzen
 
 `unbind-key -a` alle key-bindings loesen
+
 `source-file ~/.tmux.reset.conf` in Github abgelegt
 
+### set the status line's colors
+`set -g status-style fg=white,bg=blue`
