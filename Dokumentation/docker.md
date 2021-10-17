@@ -16,8 +16,8 @@ services:
   nextcloud-db:
     image: mariadb
     container_name: nextcloud-db
-    command: – transaction-isolation=READ-COMMITTED – log-bin=ROW
-    command: – innodb_read_only_compressed=OFF
+    command: --transaction-isolation=READ-COMMITTED --log-bin=ROW
+    command: --innodb_read_only_compressed=OFF
     restart: unless-stopped
     volumes:
       - /etc/localtime:/etc/localtime:ro
