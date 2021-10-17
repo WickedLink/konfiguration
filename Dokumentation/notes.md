@@ -50,3 +50,5 @@ funzt: `tmux source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxth
 `set -g status-style fg=white,bg=blue`
 
 aktuelle Einstellungen anzeigen `tmux show-options -g | grep status`
+
+- [ ] eins
