@@ -52,3 +52,9 @@ manuelle Installation
 funzt:
 
 `tmux source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxtheme`
+
+Key-Bindings zuruecksetzen
+
+`unbind-key -a` alle key-bindings loesen
+`source-file ~/.tmux.reset.conf` in Github abgelegt
+
