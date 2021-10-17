@@ -39,7 +39,7 @@ services:
     networks:
         - default
     restart: unless-stopped
-    command: redis-server – requirepass test # Redis Passwort eingeben
+    command: redis-server --requirepass test # Redis Passwort eingeben
 
   nextcloud-app:
     image: nextcloud
