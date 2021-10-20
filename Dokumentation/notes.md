@@ -53,4 +53,12 @@ aktuelle Einstellungen anzeigen `tmux show-options -g | grep status`
 
 -   [x] eins
 
+<<<<<<< HEAD
 weiter
+=======
+```
+git config --global user.email "joshua.hawx@gmx.net"
+PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git> git config --global user.name "wickedlink"
+PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git>
+```
+>>>>>>> b1022bff790aa0a14c3e84edc72a183d422426a7
