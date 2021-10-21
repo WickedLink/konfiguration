@@ -7,3 +7,4 @@ another test
 ```
 block
 ```
+:smile:
