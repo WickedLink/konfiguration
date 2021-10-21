@@ -1,3 +1,6 @@
+<!-- TOC -->
+- [some code](#some-code)
+<!-- /TOC -->
 # first
 little test
 # second
