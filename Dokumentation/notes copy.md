@@ -1,4 +1,14 @@
 # Linux 
+<!-- TOC -->
+- [git](#git)
+- [stow](#stow)
+- [apt-get](#apt-get)
+- [tmux](#tmux)
+    - [Tmux Themepack](#tmux-themepack)
+    - [Key-Bindings zuruecksetzen](#key-bindings-zuruecksetzen)
+    - [set the status line's colors](#set-the-status-lines-colors)
+<!-- /TOC -->
+
 ## git
 Git Repo klonen `git clone git@github.com:WickedLink/konfiguration.git`
 
@@ -59,4 +69,6 @@ PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git> git config --global user.n
 PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git>
 ```
 
-jetzt vom web
+jetzt vom web :anchor:
+
+
