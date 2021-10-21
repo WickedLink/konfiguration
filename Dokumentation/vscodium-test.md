@@ -1,15 +1,22 @@
 <!-- TOC -->
-- [some code](#some-code)
+- [top](#top)
+    - [first](#first)
+    - [second](#second)
+    - [some code](#some-code)
+        - [emoji](#emoji)
+            - [another emoji](#another-emoji)
 <!-- /TOC -->
-# first
+# top
+## first
 little test
-# second
+## second
 another test
 ## some code
 `inline`
 ```
 block
 ```
+### emoji
 :smile:
-
+#### another emoji
 🔃
