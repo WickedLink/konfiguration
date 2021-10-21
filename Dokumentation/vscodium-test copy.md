@@ -1,10 +1,9 @@
 <!-- TOC -->
-- [top](#top)
-    - [first](#first)
-    - [second](#second)
-    - [some code](#some-code)
-        - [emoji](#emoji)
-            - [another emoji](#another-emoji)
+- [first](#first)
+- [second](#second)
+- [some code](#some-code)
+    - [emoji](#emoji)
+        - [another emoji](#another-emoji)
 <!-- /TOC -->
 # top
 ## first
