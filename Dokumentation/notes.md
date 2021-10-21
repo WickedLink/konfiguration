@@ -51,7 +51,7 @@ funzt: `tmux source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxth
 
 aktuelle Einstellungen anzeigen `tmux show-options -g | grep status`
 
-weiter
+weiter :arrow_backward: :arrow_right:
 =======
 ```
 git config --global user.email "joshua.hawx@gmx.net"
@@ -59,4 +59,4 @@ PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git> git config --global user.n
 PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git>
 ```
 
-jetzt vom web
+jetzt vom web 🧨
