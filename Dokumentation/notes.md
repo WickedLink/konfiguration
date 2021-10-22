@@ -52,12 +52,19 @@ funzt: `tmux source-file "${HOME}/.tmux-themepack/powerline/default/green.tmuxth
 
 aktuelle Einstellungen anzeigen `tmux show-options -g | grep status`
 
-weiter 👻
+## wget (download files from commandline)
+
+- download to current folder `wget http://example.com/file.tar`
+
+Without supplying any extra parameters in the command, wget will save the downloaded file to whatever directory your terminal is currently set to. If you want to specify where the file should be saved, you can use the -O (output) option in the command. `wget http://example.com/file.tar -O /path/to/dir/file.tar`
+
+
+
+
+weiter 
 =======
 ```
 git config --global user.email "joshua.hawx@gmx.net"
 PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git> git config --global user.name "wickedlink"
 PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git>
 ```
-
-## 👉 jetzt vom web 🧨
