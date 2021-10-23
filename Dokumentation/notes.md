@@ -58,7 +58,20 @@ aktuelle Einstellungen anzeigen `tmux show-options -g | grep status`
 
 Without supplying any extra parameters in the command, wget will save the downloaded file to whatever directory your terminal is currently set to. If you want to specify where the file should be saved, you can use the -O (output) option in the command. `wget http://example.com/file.tar -O /path/to/dir/file.tar`
 
+## DEB-Paket installieren
 
+`sudo dpkg -i lsd_0.20.1_amd64.deb`
+
+## Programme
+
+- zshell, oh-my-zshell
+- tmux
+- bashtop
+- lsd (ls deluxe) `wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb`
+
+
+
+---
 
 
 weiter 
