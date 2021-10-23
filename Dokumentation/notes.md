@@ -71,11 +71,12 @@ Without supplying any extra parameters in the command, wget will save the downlo
 
 
 
+
+
 ---
 
+## unsorted 
 
-weiter 
-=======
 ```
 git config --global user.email "joshua.hawx@gmx.net"
 PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git> git config --global user.name "wickedlink"
