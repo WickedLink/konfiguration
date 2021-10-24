@@ -11,6 +11,7 @@
 - [wget (download files from commandline)](#wget-download-files-from-commandline)
 - [DEB-Paket installieren](#deb-paket-installieren)
 - [Programme](#programme)
+- [Aliases (oh-my-zsh)](#aliases-oh-my-zsh)
 - [unsorted](#unsorted)
 <!-- /TOC -->
 
