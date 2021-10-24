@@ -98,7 +98,7 @@ Without supplying any extra parameters in the command, wget will save the downlo
 
 Im Ordner `~/.oh-my-zsh/custom` eine beliebige `.zsh` Datei anlegen und dort die Aliases eintragen.
 
-```
+```sh
 alias lda='lsd -al'  
 alias ldas='lsd -al --total-size' 
 alias la='lsd -al'
