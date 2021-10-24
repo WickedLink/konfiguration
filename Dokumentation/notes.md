@@ -105,6 +105,7 @@ alias la='lsd -al'
 
 `la` ist schon vorher definiert, wird aber ueberschrieben.
 
+Einstellungen danach noch sourcen. `source ~/.zshrc`
 
 ---
 
