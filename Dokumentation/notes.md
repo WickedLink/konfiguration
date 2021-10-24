@@ -92,8 +92,17 @@ Without supplying any extra parameters in the command, wget will save the downlo
 - bashtop
 - lsd (ls deluxe) `wget https://github.com/Peltoche/lsd/releases/download/0.20.1/lsd_0.20.1_amd64.deb`
 
+## Aliases (oh-my-zsh)
 
+Im Ordner `~/.oh-my-zsh/custom` eine beliebige `.zsh` Datei anlegen und dort die Aliases eintragen.
 
+```
+alias lda='lsd -al'  
+alias ldas='lsd -al --total-size' 
+alias la='lsd -al'
+```
+
+`la` ist schon vorher definiert, wird aber ueberschrieben.
 
 
 ---
