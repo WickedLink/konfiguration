@@ -12,6 +12,7 @@
 - [DEB-Paket installieren](#deb-paket-installieren)
 - [Programme](#programme)
 - [Aliases (oh-my-zsh)](#aliases-oh-my-zsh)
+- [Autosuggestions in Oh My Zsh](#autosuggestions-in-oh-my-zsh)
 - [unsorted](#unsorted)
 <!-- /TOC -->
 
@@ -106,6 +107,29 @@ alias la='lsd -al'
 `la` ist schon vorher definiert, wird aber ueberschrieben.
 
 Einstellungen danach noch sourcen. `source ~/.zshrc`
+
+## Autosuggestions in Oh My Zsh
+
+1. Clone this repository into `$ZSH_CUSTOM/plugins` (by default `~/.oh-my-zsh/custom/plugins`)
+
+    ```sh
+    git clone https://github.com/zsh-users/zsh-autosuggestions ${ZSH_CUSTOM:-~/.oh-my-zsh/custom}/plugins/zsh-autosuggestions
+    ```
+
+2. Add the plugin to the list of plugins for Oh My Zsh to load (inside `~/.zshrc`):
+
+    ```sh
+    plugins=( 
+        # other plugins...
+        zsh-autosuggestions
+    )
+    ```
+
+3. Start a new terminal session.
+
+
+
+
 
 ---
 
