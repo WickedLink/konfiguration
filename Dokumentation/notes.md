@@ -127,8 +127,26 @@ Einstellungen danach noch sourcen. `source ~/.zshrc`
 
 3. Start a new terminal session.
 
+## nnn (file manager)
 
+1. Repository klonen
 
+    ```sh
+    git clone https://github.com/jarun/nnn.git
+    ```
+
+2. Dependencies installieren.
+
+    ```sh 
+    sudo apt-get install pkg-config libncursesw5-dev libreadline-dev
+    ``` 
+
+3. Kompilieren fuer die Darstellung der Icons:
+
+    ```sh
+    sudo make O_NERD=1
+    sudo make install
+    ```
 
 
 ---
@@ -138,4 +156,14 @@ Einstellungen danach noch sourcen. `source ~/.zshrc`
 ```sh
 git config --global user.email "joshua.hawx@gmx.net"
 git config --global user.name "wickedlink"
+```
+
+```sh
+sudo make 0_NERD=1 strip install
+cc  -std=c11 -Wall -Wextra -Wshadow -O3 -D_GNU_SOURCE -D_DEFAULT_SOURCE -I/usr/include/ncursesw  -o nnn  src/nnn.c -lreadline -lncursesw -ltinfo -lpthread
+strip nnn
+install -m 0755 -d /usr/local/bin
+install -m 0755 nnn /usr/local/bin
+install -m 0755 -d /usr/local/share/man/man1
+install -m 0644 nnn.1 /usr/local/share/man/man1
 ```
