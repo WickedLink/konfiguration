@@ -147,6 +147,23 @@ Einstellungen danach noch sourcen. `source ~/.zshrc`
     sudo make O_NERD=1
     sudo make install
     ```
+4. Im Plugin-Ordner die Plugins herunterladen:
+
+    ```sh
+    curl -Ls https://raw.githubusercontent.com/jarun/nnn/master/plugins/getplugs | sh
+    ```
+
+5. Die `quitcd.bash_zsh` sourcen.
+
+    In der `.zhrc` einfuegen:
+
+    ```sh
+    if [ -f /home/joshua/konfiguration/nnn/quitcd.bash_zsh ]; then
+        source /home/joshua/konfiguration/nnn/quitcd.bash_zsh
+    fi
+    ```
+
+
 
 
 ---
