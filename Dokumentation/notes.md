@@ -135,8 +135,7 @@ Einstellungen danach noch sourcen. `source ~/.zshrc`
 
 ## unsorted 
 
-```
+```sh
 git config --global user.email "joshua.hawx@gmx.net"
-PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git> git config --global user.name "wickedlink"
-PS D:\OneDrive - Kirchner EDV Service Bremen\EDV\git>
+git config --global user.name "wickedlink"
 ```
