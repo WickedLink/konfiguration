@@ -13,11 +13,12 @@
 - [Programme](#programme)
 - [Aliases (oh-my-zsh)](#aliases-oh-my-zsh)
 - [Autosuggestions in Oh My Zsh](#autosuggestions-in-oh-my-zsh)
+- [nnn (file manager)](#nnn-file-manager)
 - [unsorted](#unsorted)
 <!-- /TOC -->
 
-
 ## git
+
 
 Git Repo klonen `git clone git@github.com:WickedLink/konfiguration.git`
 
