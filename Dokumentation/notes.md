@@ -20,7 +20,6 @@
 
 ## git
 
-
 Git Repo klonen `git clone git@github.com:WickedLink/konfiguration.git`
 
 Alle Dateien aus dem aktuellen Verzeichnis hinzufuegen `git add .`
@@ -169,7 +168,8 @@ Einstellungen danach noch sourcen. `source ~/.zshrc`
 
 Standard-Admin-Anmeldung
 
-`admin` `12345`
+`a
+dmin` `12345`
 
 
 ---
