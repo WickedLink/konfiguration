@@ -14,6 +14,7 @@
 - [Aliases (oh-my-zsh)](#aliases-oh-my-zsh)
 - [Autosuggestions in Oh My Zsh](#autosuggestions-in-oh-my-zsh)
 - [nnn (file manager)](#nnn-file-manager)
+- [Rainloop Mail](#rainloop-mail)
 - [unsorted](#unsorted)
 <!-- /TOC -->
 
@@ -164,7 +165,11 @@ Einstellungen danach noch sourcen. `source ~/.zshrc`
     fi
     ```
 
+## Rainloop Mail
 
+Standard-Admin-Anmeldung
+
+`admin` `12345`
 
 
 ---
