@@ -15,6 +15,9 @@
 - [Autosuggestions in Oh My Zsh](#autosuggestions-in-oh-my-zsh)
 - [nnn (file manager)](#nnn-file-manager)
 - [Rainloop Mail](#rainloop-mail)
+- [Inkscape](#inkscape)
+    - [Grafik zuschneiden](#grafik-zuschneiden)
+- [Windows Laufwerksbuchstaben löschen](#windows-laufwerksbuchstaben-löschen)
 - [unsorted](#unsorted)
 <!-- /TOC -->
 
@@ -168,9 +171,19 @@ Einstellungen danach noch sourcen. `source ~/.zshrc`
 
 Standard-Admin-Anmeldung
 
-`a
-dmin` `12345`
+`admin` `12345`
 
+## Inkscape
+
+### Grafik zuschneiden
+
+Über die Grafik Rechteck, Kreis oder andere Form zeichnen. Die Form nimmt den Platz ein, der stehen bleiben soll.
+
+## Windows Laufwerksbuchstaben löschen
+
+`Computer\HKEY_LOCAL_MACHINE\SYSTEM\MountedDevices`
+
+Nach `\DosDevices\Z:` suchen und löschen.
 
 ---
 
