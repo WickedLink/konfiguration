@@ -10,12 +10,14 @@
   - [Registry](#registry)
       - [Öffnen von `HKCU` anderer lokaler User](#öffnen-von-hkcu-anderer-lokaler-user)
       - [Netzwerkumgebung ausblenden](#netzwerkumgebung-ausblenden)
-  - [Rechner im Netzwerk verstecken](#rechner-im-netzwerk-verstecken)
+  - [Rechner im Netzwerk verstecken (funktioniert nicht)](#rechner-im-netzwerk-verstecken-funktioniert-nicht)
   - [Nova von extern starten](#nova-von-extern-starten)
+  - [Airbus Datenbank](#airbus-datenbank)
   - [Verzeichnisse und Dateien mit Berechtigungen kopieren](#verzeichnisse-und-dateien-mit-berechtigungen-kopieren)
   - [Verzeichnisse synchronisieren / spiegeln (in eine Richtung)](#verzeichnisse-synchronisieren--spiegeln-in-eine-richtung)
   - [virtuelle Festplatte mounten](#virtuelle-festplatte-mounten)
   - [Powershell](#powershell)
+  - [STLB](#stlb)
   - [Serverübersicht](#serverübersicht)
 <!-- /TOC -->
 
@@ -41,9 +43,16 @@
 
 #### Netzwerkumgebung ausblenden
 
-- Pfad `HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\NonEnum`
+Pfad `HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\NonEnum`
 
-## Rechner im Netzwerk verstecken
+Falls `NonEnum` nicht existiert, einfach erstellen.
+
+folgenden Schlüssel erstellen
+`{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}`
+
+hierbei den HEX-Wert auf 1 setzen
+
+## Rechner im Netzwerk verstecken (funktioniert nicht)
 
 `net config server /hidden:yes`
 
@@ -59,6 +68,11 @@ Cloudzugang für die Prerequisites
 
 > https://cloud.kirchner-ingenieure.de/s/TkPegcTRnS5NKnk  
 > cad#-agenTUR-25  
+
+## Airbus Datenbank
+
+Port: 41456
+PW: airbussql#
 
 ## Verzeichnisse und Dateien mit Berechtigungen kopieren
 
@@ -83,7 +97,34 @@ oh-my-posh get shell
 notepad $PROFILE
 New-Item -Path $PROFILE -Type File -Force
 oh-my-posh init pwsh | Invoke-Expression
+oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH/jandedobbeleer.omp.json" | Invoke-Expression
+install-module -name terminal-icons -repository psgallery
+import-module -name terminal-icons
+install-module psreadline
 ```
+
+## STLB
+
+Setzen Sie den Haken vor „EasyLogin unterstützt“ und Schließen Sie das Freigabecenter. 
+Anschließend muss im Internet Informationsdienste Manager der Anwendungspool 
+„SBAPI.AppPool“ einmal beendet und neu gestartet werden. 
+Danach ist in Ihrem STLB-Bau Server die „Easy Login“ Funktion aktiviert und kan
+n von der AVA Software verwendet 
+werden.
+Das Aktivieren der „Easy Login“ Funktion sorgt technisch dafür, dass 
+bei einer Anmeldung 
+am STLB
+-
+Bau mit eine
+m unbekannten Nutzernamen, dieser Nutzer autom
+a
+tisch durch 
+STLB
+-
+Bau als neuer Nutzer angelegt wird und anschließend im STLB
+-
+Bau arbeiten kann
+.
 
 ## Serverübersicht
 
@@ -95,8 +136,9 @@ graph TD;
     kgt-mi-hv --> kgt-mi-abacus["Abacus WebServer <br> kgt-abacus"];
     kgt-mi-hv --> kgt-mi-rp["Reverse Proxy <br> debian-rp"];
     kgt-mi-sql --> novadb[(Nova KGT)];
-    kgt-mi-sql --> calidb[(Nova Airbus)];
+    kgt-mi-sql --> airbusdb[(Nova Airbus)];
     kgt-mi-sql --> tricdb[(Tric)];
+    kgt-mi-sql --> calidb[(California)];
 ```
 
 
