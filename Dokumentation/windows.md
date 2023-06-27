@@ -47,7 +47,7 @@ Pfad `HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\NonEn
 
 Falls `NonEnum` nicht existiert, einfach erstellen.
 
-folgenden Schlüssel erstellen
+folgenden DWORD-Schlüssel erstellen
 `{F02C1A0D-BE21-4350-88B0-7367FC96EF3C}`
 
 hierbei den HEX-Wert auf 1 setzen
