@@ -101,7 +101,16 @@ oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH/jandedobbeleer.omp.json" | 
 install-module -name terminal-icons -repository psgallery
 import-module -name terminal-icons
 install-module psreadline
+
+Update:
+winget upgrade JanDeDobbeleer.OhMyPosh -s winget
 ```
+
+## Domänenuser und Scripts anzeigen
+```
+dsquery * domainroot -filter "(&(objectCategory=Person)(objectClass=User))" -limit 0 -attr sAMAccountName sn givenName scriptpath distinguishedName > C:\Loginscript.txt
+```
+
 
 ## STLB
 
