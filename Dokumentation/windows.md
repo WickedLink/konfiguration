@@ -99,7 +99,8 @@ New-Item -Path $PROFILE -Type File -Force
 oh-my-posh init pwsh | Invoke-Expression
 oh-my-posh init pwsh --config "$env:POSH_THEMES_PATH/jandedobbeleer.omp.json" | Invoke-Expression
 install-module -name terminal-icons -repository psgallery
-import-module -name terminal-icons
+import
+-module -name terminal-icons
 install-module psreadline
 
 Update:
@@ -134,6 +135,19 @@ Bau als neuer Nutzer angelegt wird und anschließend im STLB
 -
 Bau arbeiten kann
 .
+
+## Remotedesktop auf TCP umstellen
+
+```
+Computer\HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client
+```
+
+Hier muss ein weiterer Registry-Wert mit dem Namen `fClientDisableUDP` angelegt werden. Diesem neuen DWORD 32-Bit Wert „fClientDisableUDP“ müsst Ihr dann noch den Wert „1“ zuweisen.
+
+## Proxy anzeigen
+
+`netsh winhttp show proxy`
+
 
 ## Serverübersicht
 
