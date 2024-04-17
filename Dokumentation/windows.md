@@ -16,6 +16,7 @@
 - [Verzeichnisse synchronisieren / spiegeln (in eine Richtung)](#verzeichnisse-synchronisieren--spiegeln-in-eine-richtung)
 - [virtuelle Festplatte mounten](#virtuelle-festplatte-mounten)
 - [Powershell](#powershell)
+  - [installierte Software auflisten](#installierte-software-auflisten)
 - [Domänenuser und Scripts anzeigen](#domänenuser-und-scripts-anzeigen)
 - [STLB](#stlb)
 - [Remotedesktop auf TCP umstellen](#remotedesktop-auf-tcp-umstellen)
@@ -92,7 +93,7 @@ Am Besten über die Datenträgerverwaltung einbinden.
 
 ## Powershell
 
-```
+```powershell
 winget install JanDeDobbeleer.OhMyPosh -s winget
 (Get-Command oh-my-posh).Source
 oh-my-posh get shell
@@ -109,7 +110,14 @@ Update:
 winget upgrade JanDeDobbeleer.OhMyPosh -s winget
 ```
 
+### installierte Software auflisten
+
+```powershell
+Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort Displayname | Select-Object DisplayName, DisplayVersion, InstallDate, Publisher
+```
+
 ## Domänenuser und Scripts anzeigen
+
 ```
 dsquery * domainroot -filter "(&(objectCategory=Person)(objectClass=User))" -limit 0 -attr sAMAccountName sn givenName scriptpath distinguishedName > C:\Loginscript.txt
 ```
@@ -150,6 +158,13 @@ Hier muss ein weiterer Registry-Wert mit dem Namen `fClientDisableUDP` angelegt 
 
 `netsh winhttp show proxy`
 
+## Windows ohne MS-Konto installieren
+
+1. Bei der Installation Sprache und Keyboardlayout auswählen.
+2. Wenn nach dem WLAN gefragt wird, Shift+F10 drücken. Dadurch wird eine Shell geöffnet.
+3. `oobe\BypassNRO` eingeben.
+4. Rechner startet neu. "Ich habe kein Internet" und "Mit eingeschränkter Einrichtung fortfahren" auswählen
+
 
 ## Serverübersicht
 
@@ -165,6 +180,8 @@ graph TD;
     kgt-mi-sql --> tricdb[(Tric)];
     kgt-mi-sql --> calidb[(California)];
 ```
+
+
 
 
 <!---
