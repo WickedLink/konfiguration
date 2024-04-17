@@ -16,11 +16,11 @@
 - [Verzeichnisse synchronisieren / spiegeln (in eine Richtung)](#verzeichnisse-synchronisieren--spiegeln-in-eine-richtung)
 - [virtuelle Festplatte mounten](#virtuelle-festplatte-mounten)
 - [Powershell](#powershell)
-  - [installierte Software auflisten](#installierte-software-auflisten)
 - [Domänenuser und Scripts anzeigen](#domänenuser-und-scripts-anzeigen)
 - [STLB](#stlb)
 - [Remotedesktop auf TCP umstellen](#remotedesktop-auf-tcp-umstellen)
 - [Proxy anzeigen](#proxy-anzeigen)
+- [Windows ohne MS-Konto installieren](#windows-ohne-ms-konto-installieren)
 - [Serverübersicht](#serverübersicht)
 <!-- /TOC -->
 
