@@ -197,6 +197,8 @@ Invoke-Command -Session $sessions -ScriptBlock { (Get-CimInstance Win32_Computer
 
 Dienst BITS auf allen Rechnern beenden
 Invoke-Command -Session $sessions -ScriptBlock { Stop-Service BITS -Force }
+
+Get-Process pccntmon, system, nova, arriba, bricscad, tmlisten, tmbmsrv, tmccsf, tmpfw, ntrtscan, cetasvc  | select Name, Description, CPU, FileVersion, Company | Out-GridView
 ```
 
 
