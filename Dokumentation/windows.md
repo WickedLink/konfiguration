@@ -110,11 +110,101 @@ Update:
 winget upgrade JanDeDobbeleer.OhMyPosh -s winget
 ```
 
-### installierte Software auflisten
+prüfen, ob Powershell-Remoting aktiv
+```powershell
+Test-WSMan
+Test-WSMan kgt-mi-ps -Authentication Negotiate -Credential $cred
+Get-NetTCPConnection -LocalPort 5985
+Test-NetConnection -ComputerName kgt-mi-ps -Port 5985
+```
 
+Remoting aktivieren
+```powershell
+winrm quickconfig
+```
+
+WinRM Konfiguration anzeigen
+```powershell
+winrm get winrm/config/client
+winrm get winrm/config/service
+winrm enumerate winrm/config/listener
+```
+
+installierte Software auflisten
 ```powershell
 Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort Displayname | Select-Object DisplayName, DisplayVersion, InstallDate, Publisher
 ```
+
+Anmeldeinformationen in Variable speichern
+```powershell
+$cred = Get-Credential
+```
+
+Variable anzeigen
+```powershell
+$cred
+$cred.UserName
+```
+
+
+
+
+Remotesession öffnen
+```powershell
+Enter-PSSession rechner1 -Credential $cred
+```
+
+Remotesession verlassen
+```powershell
+Exit-PSSession
+```
+
+installierte Software auflisten
+```powershell
+Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uninstall\* | Sort Displayname | Select-Object DisplayName, DisplayVersion, InstallDate, Publisher
+```
+
+Ordner erstellen
+```powershell
+New-Item -Name "remoteordner" -ItemType Directory
+New-Item -Name “Testordner” -ItemType Directory -Path “C:\Temp\”
+```
+
+Datei erstellen
+```powershell
+New-Item -Name “Dateiname.txt” -ItemType File -Path “C:\Temp\”
+```
+
+leere Ordner löschen
+```powershell
+$alleordneranzeigen=Get-ChildItem -Path “C:\Temp\” -Directory -Recurse
+foreach($ordner in $alleordneranzeigen)
+{
+    if(($ordner | Get-ChildItem -Recurse).Count -eq 0)
+    {
+      Remove-Item -Path $ordner.FullName
+    }
+}
+```
+
+Ordner löschen
+```powershell
+Remove-Item -Path “C:\Temp\Testordner1\”
+```
+
+Remoterechner neu starten
+```powershell
+Restart-Computer -ComputerName kgt-mi-hun868nb -Credential $cred -Force
+```
+
+Environment-Variablen
+```powershell
+$env:COMPUTERNAME
+$env:USERDOMAIN
+```
+
+
+
 
 ## Domänenuser und Scripts anzeigen
 
