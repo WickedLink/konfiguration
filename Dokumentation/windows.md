@@ -146,13 +146,59 @@ $cred
 $cred.UserName
 ```
 
+mehrere Computer neu starten
+```powershell
+Restart-Computer -ComputerName RemoteDevice1, RemoteDevice2, RemoteDevice3 -Credential $creds
 
-
+$devices = Get-Content -Path C:\listOfServers.txt
+Restart-Computer -ComputerName $devices -Credential $Creds -Force
+```
 
 Remotesession öffnen
 ```powershell
 Enter-PSSession rechner1 -Credential $cred
 ```
+
+Sessions zu mehreren Computern herstellen
+```powershell
+$credential = Get-Credential
+$multiSession = New-PSSession -ComputerName RemoteDeviceName1, RemoteDeviceName2, RemoteDeviceName3 -Credential $credential
+
+$devices = Get-Content -Path C:\listOfServers.txt
+$credential = Get-Credential
+$multiSession = New-PSSession -ComputerName $devices -Credential $credential
+```
+
+Verschiedenes
+```powershell
+$session = New-PSSession -ComputerName kgt-mi-ps -Credential $cred
+Invoke-Command -Session $session -ScriptBlock {hostname}
+
+$sessionOptions = New-PSSessionOption -SkipCNCheck -SkipCACheck -SkipRevocationCheck
+$advancedSession = New-PSSession -ComputerName 10.0.3.27 -Credential user -UseSSL -SessionOption $so
+
+Anzahl der Prozessoren anzeigen
+Invoke-Command -Session $sessions -ScriptBlock { (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors }
+
+RAM jedes angegebenen Rechners anzeigen
+Invoke-Command -Session $sessions -ScriptBlock { Get-CimInstance Win32_OperatingSystem | Measure-Object -Property TotalVisibleMemorySize -Sum | ForEach-Object { [Math]::Round($_.sum / 1024 / 1024) } }
+
+freien Speicherplatz auf c: aller angegebenen Rechner anzeigen
+Invoke-Command -Session $sessions -ScriptBlock {
+    $driveData = Get-PSDrive C | Select-Object Used, Free
+    $total = $driveData.Used + $driveData.Free
+    $calc = [Math]::Round($driveData.Free / $total, 2)
+    $perFree = $calc * 100
+    return $perFree
+}
+
+Anzahl der logischen CPUs anzeigen
+Invoke-Command -Session $sessions -ScriptBlock { (Get-CimInstance Win32_ComputerSystem).NumberOfLogicalProcessors }
+
+Dienst BITS auf allen Rechnern beenden
+Invoke-Command -Session $sessions -ScriptBlock { Stop-Service BITS -Force }
+```
+
 
 Remotesession verlassen
 ```powershell
