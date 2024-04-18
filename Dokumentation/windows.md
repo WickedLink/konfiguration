@@ -199,8 +199,41 @@ Dienst BITS auf allen Rechnern beenden
 Invoke-Command -Session $sessions -ScriptBlock { Stop-Service BITS -Force }
 
 Get-Process pccntmon, system, nova, arriba, bricscad, tmlisten, tmbmsrv, tmccsf, tmpfw, ntrtscan, cetasvc  | select Name, Description, CPU, FileVersion, Company | Out-GridView
+
+Computer herunterfahren
+Stop-Computer
 ```
 
+Mit `Get-ChildItem` können Sie alle Elemente in einem Ordner direkt abrufen. Fügen Sie den optionalen Parameter *Force* hinzu, um ausgeblendete oder Systemelemente anzuzeigen. Dieser Befehl zeigt z. B. den unmittelbaren Inhalt des PowerShell-Laufwerks `C:` an.
+
+```powershell
+Get-ChildItem -Path C:\ -Force
+```
+
+Um Elemente in Unterordnern anzuzeigen, müssen Sie den Recurse-Parameter angeben. Der folgende Befehl listet alle Elemente auf dem Laufwerk `C:` auf:
+
+```powershell
+Get-ChildItem -Path C:\ -Force -Recurse
+```
+
+Der folgende Befehl sucht alle ausführbaren Dateien im Ordner „Programme“, die nach dem 1. Oktober 2005 zuletzt geändert wurden und weder kleiner als 1 MB noch größer als 10 MB sind:
+```powershell
+Get-ChildItem -Path $env:ProgramFiles -Recurse -Include *.exe |
+    Where-Object -FilterScript {
+        ($_.LastWriteTime -gt '2005-10-01') -and ($_.Length -ge 1mb) -and ($_.Length -le 10mb)
+    }
+```
+
+
+Dieser Befehl kopiert den Ordner `C:\temp\test1` rekursiv in den neuen Ordner `C:\temp\DeleteMe`:
+```powershell
+Copy-Item C:\temp\test1 -Recurse C:\temp\DeleteMe
+```
+
+Sie können auch eine Auswahl von Elementen kopieren. Der folgende Befehl kopiert alle .txt-Dateien, die an beliebiger Stelle in `C:\data` enthalten sind, nach `C:\temp\text`:
+```powershell
+Copy-Item -Filter *.txt -Path c:\data -Recurse -Destination C:\temp\text
+```
 
 Remotesession verlassen
 ```powershell
@@ -214,7 +247,7 @@ Get-ItemProperty HKLM:\Software\Wow6432Node\Microsoft\Windows\CurrentVersion\Uni
 
 Ordner erstellen
 ```powershell
-New-Item -Name "remoteordner" -ItemType Directory
+New-Item -Name "ordner" -ItemType Directory
 New-Item -Name “Testordner” -ItemType Directory -Path “C:\Temp\”
 ```
 
@@ -240,6 +273,11 @@ Ordner löschen
 Remove-Item -Path “C:\Temp\Testordner1\”
 ```
 
+Wenn Sie nicht für jedes enthaltene Element aufgefordert werden möchten, geben Sie den Recurse-Parameter an:
+```powershell
+Remove-Item -Path C:\temp\DeleteMe -Recurse
+```
+
 Remoterechner neu starten
 ```powershell
 Restart-Computer -ComputerName kgt-mi-hun868nb -Credential $cred -Force
@@ -251,7 +289,36 @@ $env:COMPUTERNAME
 $env:USERDOMAIN
 ```
 
+Sie können mithilfe des Befehls New-PSDrive auch einen lokalen Ordner zuordnen. Der folgende Befehl erstellt ein lokales Laufwerk P: im lokalen Verzeichnis „Programme“, das nur in der PowerShell-Sitzung sichtbar ist:
+```powershell
+New-PSDrive -Name P -Root $env:ProgramFiles -PSProvider FileSystem
+```
 
+Wie bei Netzlaufwerken sind in PowerShell zugeordnete Laufwerke für die PowerShell-Shell sofort sichtbar. Verwenden Sie den Persist-Parameter, um ein zugeordnetes Laufwerk zu erstellen, das im Datei-Explorer sichtbar ist. Mit Persist können aber nur Remotepfade verwendet werden.
+
+Eine der häufigeren Speicherformate für Textdaten ist eine Datei mit separaten Zeilen, die als einzelne Datenelemente behandelt werden. Das Cmdlet Get-Content kann zum Lesen einer vollständigen Datei in einem Schritt verwendet werden, wie hier gezeigt:
+
+```powershell
+Get-Content -Path $PROFILE
+# Load modules and change to the PowerShell-Docs repository folder
+Import-Module posh-git
+Set-Location C:\Git\PowerShell-Docs
+```
+
+`Get-Content` behandelt die aus der Datei gelesenen Daten als Array, mit je einem Element pro Zeile des Dateiinhalts. Sie können dies anhand der Länge (Length) des zurückgegebenen Inhalts überprüfen:
+
+```powershell
+PS> (Get-Content -Path $PROFILE).Length
+3
+```
+
+Dieser Befehl ist besonders hilfreich zum Abrufen von Listen mit Informationen in PowerShell. Beispielsweise können Sie eine Liste mit Computernamen oder IP-Adressen in der Datei `C:\temp\domainMembers.txt` speichern, wobei in jede Zeile der Datei je ein Name geschrieben wird. Mit `Get-Content` können Sie die Dateiinhalte abrufen und in die Variable `$Computers` einfügen:
+
+```powershell
+$Computers = Get-Content -Path C:\temp\DomainMembers.txt
+```
+
+`$Computers` ist jetzt ein Array mit einem Computernamen in jedem Element.
 
 
 ## Domänenuser und Scripts anzeigen
