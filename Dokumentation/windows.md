@@ -93,6 +93,20 @@ Am Besten über die Datenträgerverwaltung einbinden.
 
 ## Powershell
 
+Powershell Scripte ausführen
+```powershell
+Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope LocalMachine
+Get-ExecutionPolicy -List
+
+Set-ExecutionPolicy
+   [-ExecutionPolicy] <ExecutionPolicy>
+   [[-Scope] <ExecutionPolicyScope>]
+   [-Force]
+   [-WhatIf]
+   [-Confirm]
+   [<CommonParameters>]
+```
+
 ```powershell
 winget install JanDeDobbeleer.OhMyPosh -s winget
 (Get-Command oh-my-posh).Source
