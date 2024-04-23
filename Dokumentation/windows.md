@@ -269,6 +269,7 @@ New-Item -Name “Testordner” -ItemType Directory -Path “C:\Temp\”
 Datei erstellen
 ```powershell
 New-Item -Name “Dateiname.txt” -ItemType File -Path “C:\Temp\”
+New-Item -Name “computerlist.txt” -ItemType File -Path “C:\inst\”
 ```
 
 leere Ordner löschen
