@@ -336,6 +336,12 @@ $Computers = Get-Content -Path C:\temp\DomainMembers.txt
 
 `$Computers` ist jetzt ein Array mit einem Computernamen in jedem Element.
 
+Nachricht an Computer senden
+msg * /server:192.168.178.10 "Deine Nachricht"
+msg * /server:kgt-mi-ps /time:1 "Ahwas?"
+Start-Sleep 4
+msg * /server:kgt-mi-ps /time:1 "Wieso?"
+
 
 ## Domänenuser und Scripts anzeigen
 
