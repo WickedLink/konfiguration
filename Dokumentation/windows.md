@@ -297,6 +297,7 @@ Remove-Item -Path C:\temp\DeleteMe -Recurse
 Remoterechner neu starten
 ```powershell
 Restart-Computer -ComputerName kgt-mi-hun868nb -Credential $cred -Force
+Restart-Computer -ComputerName kgt-mi-bar873 -Credential $cred -Force
 ```
 
 Environment-Variablen
@@ -338,9 +339,32 @@ $Computers = Get-Content -Path C:\temp\DomainMembers.txt
 
 Nachricht an Computer senden
 msg * /server:192.168.178.10 "Deine Nachricht"
-msg * /server:kgt-mi-ps /time:1 "Ahwas?"
+Start-Sleep 4
+msg * /server:kgt-mi-hun868nb /time:1 "Ahwas?"
 Start-Sleep 4
 msg * /server:kgt-mi-ps /time:1 "Wieso?"
+Start-Sleep -Milliseconds 500
+msg * /server:kgt-mi-ps /time:1 "Wieso?"
+Start-Sleep -Milliseconds 500
+msg * /server:kgt-mi-ps /time:1 "Wieso?"
+
+(New-Object -com "wmplayer.ocx.7").cdromcollection.item(0).eject()
+
+
+```powershell
+Get-LocalUser
+Get-LocalUser -Name kirchner
+```
+
+Passwort von lokalem User ändern
+```powershell
+$Password = Read-Host -AsSecureString
+$UserAccount = Get-LocalUser -Name "kirchner"
+$UserAccount | Set-LocalUser -Password $Password
+```
+
+
+
 
 
 ## Domänenuser und Scripts anzeigen
