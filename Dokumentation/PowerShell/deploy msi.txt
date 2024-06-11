@@ -1,0 +1,30 @@
+# Define the remote computer name and MSI package path
+$ComputerName = "RemoteComputerName"
+$DestFolderPath = "C:\Temp"
+$FilePath = "C:\Temp\Firefox Setup 112.0.2.msi"
+
+# Create a new PowerShell session to the remote computer
+$Session = New-PSSession -ComputerName $ComputerName
+
+#Create the destination folder if not already exist
+Invoke-Command -ComputerName $ComputerName -ScriptBlock {
+param($DestFolderPath)
+if (!(Test-Path $DestFolderPath)) {
+}
+} -ArgumentList $DestFolderPath
+
+# Copy the MSI package to the remote computer
+Copy-Item $FilePath -Destination $DestFolderPath -ToSession $Session
+
+# Install the MSI package on the remote computer
+Invoke-Command -Session $Session -ScriptBlock {
+param($FilePath)
+cmd /c start /wait msiexec /i $FilePath /quiet} -ArgumentList $FilePath
+
+# Remove the MSI package from the remote computer
+Invoke-Command -ComputerName $ComputerName -ScriptBlock { 
+param($FilePath) 
+Remove-Item $FilePath -Force -Recurse } -ArgumentList $FilePath
+
+# Close the PowerShell session to the remote computer
+Remove-PSSession $Session

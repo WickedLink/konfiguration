@@ -363,7 +363,8 @@ $UserAccount = Get-LocalUser -Name "kirchner"
 $UserAccount | Set-LocalUser -Password $Password
 ```
 
-
+## GIT Silentinstall
+Switches: /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 
 
 
