@@ -16,7 +16,15 @@ Enter-PSSession kgt-mi-hun868nb -Credential $cred
 # Prozesse anzeigen
 Get-Process | Out-GridView
 Get-Process
+Get-Process no*
+
+# Prozess beenden
+Stop-Process -Name "notepad"
 
 # Computer herunterfahren
 Stop-Computer -Force
+
+# Befehl in Remotesession ausführen
+$session = New-PSSession -ComputerName kgt-mi-ps -Credential $cred
+Invoke-Command -Session $session -ScriptBlock {hostname}
 
