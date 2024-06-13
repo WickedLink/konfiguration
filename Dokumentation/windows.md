@@ -343,6 +343,7 @@ $Computers = Get-Content -Path C:\temp\DomainMembers.txt
 `$Computers` ist jetzt ein Array mit einem Computernamen in jedem Element.
 
 Nachricht an Computer senden
+```powershell
 msg * /server:192.168.178.10 "Deine Nachricht"
 Start-Sleep 4
 msg * /server:kgt-mi-hun868nb /time:1 "Ahwas?"
@@ -352,6 +353,7 @@ Start-Sleep -Milliseconds 500
 msg * /server:kgt-mi-ps /time:1 "Wieso?"
 Start-Sleep -Milliseconds 500
 msg * /server:kgt-mi-ps /time:1 "Wieso?"
+```
 
 (New-Object -com "wmplayer.ocx.7").cdromcollection.item(0).eject()
 
@@ -367,6 +369,9 @@ $Password = Read-Host -AsSecureString
 $UserAccount = Get-LocalUser -Name "kirchner"
 $UserAccount | Set-LocalUser -Password $Password
 ```
+
+## Powershell manage Tasks
+Get-Process s*|Sort-Object cpu -Descending
 
 ## GIT Silentinstall
 Switches: /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
