@@ -17,8 +17,11 @@
   - [Verzeichnisse synchronisieren / spiegeln (in eine Richtung)](#verzeichnisse-synchronisieren--spiegeln-in-eine-richtung)
   - [virtuelle Festplatte mounten](#virtuelle-festplatte-mounten)
   - [Powershell](#powershell)
+  - [Powershell manage Tasks](#powershell-manage-tasks)
   - [GIT Silentinstall](#git-silentinstall)
   - [Domänenuser und Scripts anzeigen](#domänenuser-und-scripts-anzeigen)
+  - [GITHUB in VSCode einrichten](#github-in-vscode-einrichten)
+    - [user.email und user.name einstellen](#useremail-und-username-einstellen)
   - [STLB](#stlb)
   - [am STLB](#am-stlb)
   - [STLB](#stlb-1)
@@ -383,6 +386,12 @@ Switches: /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
 ```
 dsquery * domainroot -filter "(&(objectCategory=Person)(objectClass=User))" -limit 0 -attr sAMAccountName sn givenName scriptpath distinguishedName > C:\Loginscript.txt
 ```
+
+## GITHUB in VSCode einrichten
+
+### user.email und user.name einstellen
+    git config --global user.email “you@example.com”
+    git config --global user.name “Your Name”
 
 
 ## STLB
