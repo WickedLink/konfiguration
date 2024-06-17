@@ -17,6 +17,7 @@
   - [Verzeichnisse synchronisieren / spiegeln (in eine Richtung)](#verzeichnisse-synchronisieren--spiegeln-in-eine-richtung)
   - [virtuelle Festplatte mounten](#virtuelle-festplatte-mounten)
   - [Powershell](#powershell)
+  - [prüfen, wer am Rechner angemeldet ist](#prüfen-wer-am-rechner-angemeldet-ist)
   - [Powershell manage Tasks](#powershell-manage-tasks)
   - [GIT Silentinstall](#git-silentinstall)
   - [Domänenuser und Scripts anzeigen](#domänenuser-und-scripts-anzeigen)
@@ -371,6 +372,16 @@ Passwort von lokalem User ändern
 $Password = Read-Host -AsSecureString
 $UserAccount = Get-LocalUser -Name "kirchner"
 $UserAccount | Set-LocalUser -Password $Password
+```
+
+## prüfen, wer am Rechner angemeldet ist
+    qwinsta /server:remotePC
+
+```powershell
+$computer = 'kgt-mi-fel841k'  
+gwmi win32_LogonSession -Computer $computer -Filter 'LogonType=2 or LogonType=10' | %{  
+    gwmi -ComputerName $computer -Query "Associators of {Win32_LogonSession.LogonId=$($_.LogonId)} Where AssocClass=Win32_LoggedOnUser Role=Dependent" | select -Expand Name  
+}
 ```
 
 ## Powershell manage Tasks

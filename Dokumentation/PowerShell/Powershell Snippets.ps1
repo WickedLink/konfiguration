@@ -1,5 +1,6 @@
 # Anmeldeinformationen in Variable speichern
-moses
+$cred = Get-Credential
+
 # prüfen, ob Powershell-Remoting aktiv
 Test-WSMan
 Test-WSMan kgt-mi-ps -Authentication Negotiate -Credential $cred
@@ -12,6 +13,10 @@ winget list
 
 # Remotesession öffnen
 Enter-PSSession kgt-mi-hun868nb -Credential $cred
+Enter-PSSession kgt-mi-let863 -Credential $cred
+
+# Remotesession verlassen
+Exit-PSSession
 
 # Prozesse anzeigen
 Get-Process | Out-GridView
@@ -28,3 +33,13 @@ Stop-Computer -Force
 $session = New-PSSession -ComputerName kgt-mi-ps -Credential $cred
 Invoke-Command -Session $session -ScriptBlock {hostname}
 
+$computer = 'kgt-mi-fel841k'  
+gwmi win32_LogonSession -Computer $computer -Filter 'LogonType=2 or LogonType=10' | %{  
+    gwmi -ComputerName $computer -Query "Associators of {Win32_LogonSession.LogonId=$($_.LogonId)} Where AssocClass=Win32_LoggedOnUser Role=Dependent" | select -Expand Name  
+}
+
+# installierte Software auflisten
+Get-WmiObject win32_product -ComputerName kgt-mi-hun868nb | Select-Object name, version
+
+# Computername auslesen
+Get-ChildItem Env:\COMPUTERNAME
