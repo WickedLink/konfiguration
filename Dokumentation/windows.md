@@ -20,6 +20,7 @@
   - [prüfen, wer am Rechner angemeldet ist](#prüfen-wer-am-rechner-angemeldet-ist)
   - [Powershell manage Tasks](#powershell-manage-tasks)
   - [GIT Silentinstall](#git-silentinstall)
+  - [7zip Silentinstall](#7zip-silentinstall)
   - [Domänenuser und Scripts anzeigen](#domänenuser-und-scripts-anzeigen)
   - [GITHUB in VSCode einrichten](#github-in-vscode-einrichten)
     - [user.email und user.name einstellen](#useremail-und-username-einstellen)
@@ -391,6 +392,9 @@ Get-Process s*|Sort-Object cpu -Descending
 
 ## GIT Silentinstall
 Switches: /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
+
+## 7zip Silentinstall
+Switches: /S
 
 
 

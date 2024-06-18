@@ -60,6 +60,6 @@ msg * /server:kgt-mi-let863 /time:10 "Ahwas?"
 Start-Sleep 4
 msg * /server:kgt-mi-hun868nb /time:1 "Häh?"
 Start-Sleep -Milliseconds 500
-msg * /server:kgt-mi-hun868nb /time:1 "Wieso?"
+msg * /server:kgt-mi-let863 /time:1 "Wieso?"
 Start-Sleep -Milliseconds 500
-msg * /server:kgt-mi-hun868nb /time:1 "Warum?"
+msg * /server:kgt-mi-let863 /time:1 "Warum?"
