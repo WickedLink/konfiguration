@@ -385,7 +385,9 @@ gwmi win32_LogonSession -Computer $computer -Filter 'LogonType=2 or LogonType=10
 ```
 
 ## Powershell manage Tasks
+```powershell
 Get-Process s*|Sort-Object cpu -Descending
+```
 
 ## GIT Silentinstall
 Switches: /SP- /VERYSILENT /SUPPRESSMSGBOXES /NORESTART
