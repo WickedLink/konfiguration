@@ -63,3 +63,12 @@ Start-Sleep -Milliseconds 500
 msg * /server:kgt-mi-let863 /time:1 "Wieso?"
 Start-Sleep -Milliseconds 500
 msg * /server:kgt-mi-let863 /time:1 "Warum?"
+
+
+if(Test-WSMan kgt-mi-let863 -ErrorAction SilentlyContinue) {
+    $fehler = "geht"
+} 
+else {
+    $fehler = "geht nicht"
+}
+Write-Host 
