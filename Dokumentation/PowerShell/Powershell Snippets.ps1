@@ -65,7 +65,7 @@ Start-Sleep -Milliseconds 500
 msg * /server:kgt-mi-let863 /time:1 "Warum?"
 
 # prüfen, ob Powershell-Remoting aktiviert ist 1
-if(Test-WSMan kgt-mi-let863 -ErrorAction SilentlyContinue) {
+if(Test-WSMan kgt-mi-ps -ErrorAction SilentlyContinue) {
     $fehler = "geht"
 } 
 else {
