@@ -94,3 +94,6 @@ $Password = Read-Host -AsSecureString
 $UserAccount = Get-LocalUser -Name "kirchner"
 $UserAccount | Set-LocalUser -Password $Password
 
+# Computernamen abfragen
+$computerName = (Resolve-DnsName -Name $ipAddress -Type PTR).NameHost
+$computerName = (Resolve-DnsName -Name 192.168.1.46 -Type PTR).NameHost

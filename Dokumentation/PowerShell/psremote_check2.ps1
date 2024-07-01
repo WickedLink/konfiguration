@@ -1,17 +1,17 @@
 # Pfad zur Datei mit der Liste der Remote-Rechner
-$computerListPath = "C:\Path\To\ComputerList.txt"
+$computerListPath = "C:\inst\ComputerList.txt"
 # Pfad zur allgemeinen Protokolldatei
-$logFilePath = "C:\Path\To\LogFile.txt"
+$logFilePath = "C:\inst\LogFile.txt"
 # Pfad zur Protokolldatei für nicht erreichbare Rechner
-$unreachableLogFilePath = "C:\Path\To\UnreachableLogFile.txt"
+$unreachableLogFilePath = "C:\inst\UnreachableLogFile.txt"
 # Pfad zur Protokolldatei für Rechner ohne aktiviertes PowerShell-Remoting
-$noRemotingLogFilePath = "C:\Path\To\NoRemotingLogFile.txt"
+$noRemotingLogFilePath = "C:\inst\NoRemotingLogFile.txt"
 # Pfad zur Erfolgsprotokolldatei
-$successLogFilePath = "C:\Path\To\SuccessLogFile.txt"
+$successLogFilePath = "C:\inst\SuccessLogFile.txt"
 # Pfad zur Fehlerprotokolldatei
-$errorLogFilePath = "C:\Path\To\ErrorLogFile.txt"
+$errorLogFilePath = "C:\inst\ErrorLogFile.txt"
 # Pfad zur Gesamtbericht-Datei
-$summaryLogFilePath = "C:\Path\To\SummaryLogFile.txt"
+$summaryLogFilePath = "C:\inst\SummaryLogFile.txt"
 
 # Liste der Rechner einlesen
 $computers = Get-Content -Path $computerListPath
