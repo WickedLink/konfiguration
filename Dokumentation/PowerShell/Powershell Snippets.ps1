@@ -13,7 +13,8 @@ winget list
 
 # Remotesession öffnen
 Enter-PSSession kgt-mi-bar873 -Credential $cred
-Enter-PSSession kgt-mi-surface -Credential $cred
+Enter-PSSession kgt-mi-hun868nb -Credential $cred
+Enter-PSSession kgt-mi-usr -Credential $cred
 
 # Remotesession verlassen
 Exit-PSSession
@@ -45,7 +46,7 @@ Get-WmiObject win32_product -ComputerName kgt-mi-let863 | Select-Object name, ve
 Get-ChildItem Env:\COMPUTERNAME
 
 # Windows Uptime auslesen
-(Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName kgt-mi-hun868nb).LastBootupTime
+(Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName kgt-mi-dem804).LastBootupTime
 
 # Rechner umbenennen
 Rename-Computer -NewName NEUER NAME
