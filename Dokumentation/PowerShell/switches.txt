@@ -1,0 +1,39 @@
+NDP472-KB4054530-x86-x64-AllOS-ENU.exe
+/q /norestart
+
+NDP48-x86-x64-AllOS-ENU.exe
+/q /norestart
+
+dotnet-hosting-3.1.28-win.exe
+/install /quiet /norestart
+
+SSCERuntime_x86-DEU.msi
+msiexec /i SSCERuntime_x86-DEU.msi /qn /norestart
+
+SSCERuntime_x64-DEU.msi
+msiexec /i SSCERuntime_x64-DEU.msi /qn /norestart
+
+msoledbsql.msi
+msiexec /i msoledbsql.msi /qn /norestart
+
+VC_redist.x64.exe
+/install /quiet
+
+VC_redist.x86.exe
+/install /quiet
+
+msiexec /i NovaSetup_x64.msi PATCH=NovaPatch_x64.msp /qn /norestart
+
+
+
+- .Net Framework 4.8 installieren
+- Prüfen und gegebenenfalls installieren von SQL Server Compact 3.5
+-> msiexec /i "\\%NOVAINSTALL%\sql server compact edition\SSCERuntime_x86-DEU.msi" /qn /norestart
+-> msiexec /i "\\%NOVAINSTALL%\sql server compact edition\SSCERuntime_x64-DEU.msi" /qn /norestart
+- Prüfen und gegebenenfalls installieren von Visual C++ Runtime
+-> \\%NOVAINSTALL%\vcredist2019\VC_redist.x86.exe /q /norestart
+-> \\%NOVAINSTALL%\vcredist2019\VC_redist.x64.exe /q /norestart
+- Prüfen und gegebenenfalls installieren von .net Core
+-> \\NOVAINSTALL%\dotnet-hosting-3.1.10\dotnet-hosting-3.1.10-win.exe /q /norestart
+- Installation Nova und falls vorhanden inkl. Patch (Die MSP-Datei ist die Patchdatei)
+-> msiexec /i "\\%NOVAINSTALL\Data\NovaSetup_x64.msi" PATCH="\\%NOVAINSTALL\NovaPatch_x64.msp" /qn /norestart

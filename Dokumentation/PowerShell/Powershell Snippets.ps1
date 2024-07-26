@@ -46,7 +46,7 @@ Get-WmiObject win32_product -ComputerName kgt-mi-let863 | Select-Object name, ve
 Get-ChildItem Env:\COMPUTERNAME
 
 # Windows Uptime auslesen
-(Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName kgt-mi-dem804).LastBootupTime
+(Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName kgt-mi-dem804-2).LastBootupTime
 
 # Rechner umbenennen
 Rename-Computer -NewName NEUER NAME
@@ -64,6 +64,9 @@ Start-Sleep -Milliseconds 500
 msg * /server:kgt-mi-let863 /time:1 "Wieso?"
 Start-Sleep -Milliseconds 500
 msg * /server:kgt-mi-let863 /time:1 "Warum?"
+
+msg * /server:<remote_computer_name> /time:30 "Hello from PowerShell!`nThis is a new line."
+msg * /server:kgt-mi-ps /time:30 "Hello from PowerShell!`nThis is a new line."
 
 # prüfen, ob Powershell-Remoting aktiviert ist 1
 if(Test-WSMan kgt-mi-ps -ErrorAction SilentlyContinue) {
@@ -91,10 +94,15 @@ if ( Test-Connection -ComputerName $_server_to_act_on -Count 1 -Quiet ) {}
 [bool](Invoke-Command -ComputerName "kgt-mi-hun868nb" -ScriptBlock {"hello from $env:COMPUTERNAME"} -ErrorAction SilentlyContinue)
 
 # Passwort von lokalem User ändern
-$Password = Read-Host -AsSecureString
+$Password = Read-Host -AsSecureS16tring
 $UserAccount = Get-LocalUser -Name "kirchner"
 $UserAccount | Set-LocalUser -Password $Password
 
 # Computernamen abfragen
 $computerName = (Resolve-DnsName -Name $ipAddress -Type PTR).NameHost
 $computerName = (Resolve-DnsName -Name 192.168.1.46 -Type PTR).NameHost
+
+
+$AutoUpdates = New-Object -ComObject "Microsoft.Update.AutoUpdate"
+$AutoUpdates.DetectNow()
+
