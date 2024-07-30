@@ -56,73 +56,6 @@ Set-ItemProperty -Path $RegPath -Name "WallpaperStyle" -Value "3"
 5 = Desktop Hintergrundbild wird übergreifend dargestellt.
 
 
-### create a local user
-New-LocalUser -Name <Username> -Password <Password> -FullName <FullName> -Description <Description>
-New-LocalUser -Name JohnDoe -Password (ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force) -FullName "John Doe" -Description "Local user account"
-New-LocalUser -Name kirchner -Password (ConvertTo-SecureString "16+kgt-mi-ps-09" -AsPlainText -Force)
-
-
-This will create a new local user account on the remote computer with the username JohnDoe, password P@ssw0rd, full name John Doe, and description Local user account.
-Note that you need to use the ConvertTo-SecureString cmdlet to convert the password to a secure string, as required by the New-LocalUser cmdlet.
-
-This would add the JohnDoe user to the Administrators group.
-Add-LocalGroupMember -Group "Administrators" -Member "JohnDoe"
-Add-LocalGroupMember -Group "Administratoren" -Member "kirchner" # Gruppen haben dann natuerlich deutsche Namen
-
-# lokale User anzeigen
-Get-LocalUser
-
-# To get a list of all user accounts, including their names, full names, and descriptions:
-Get-LocalUser | Select-Object Name, FullName, Description
-
-# To get a list of all enabled user accounts:
-Get-LocalUser | Where-Object {$_.Enabled -eq $true}
-
-# To get a list of all user accounts that are members of a specific group (e.g., "Administrators"):
-Get-LocalUser | Where-Object {$_.PrincipalSource -eq "Local" -and $_.GroupList -contains "Administrators"}
-
-# To get a list of all user accounts with their corresponding SID (Security Identifier):
-Get-LocalUser | Select-Object Name, SID
-
-# This will retrieve a list of all local groups on the remote computer.
-Get-LocalGroup
-
-# To get a list of all group names:
-Get-LocalGroup | Select-Object Name
-
-# To get a list of all groups that a specific user is a member of:
-Get-LocalGroup | Where-Object {$_.Name -in (Get-LocalUser -Name <Username>).GroupList}
-
-########################################
-
-$user = [Security.Principal.WindowsIdentity]::GetCurrent()
-
-Get-LocalGroupMember -Group "Administratoren" # working
-
-Remove-LocalGroupMember -Group "Administratoren" -Member "stadthagen\domänen-benutzer"
-
-Get-Module -ListAvailable PSWindowsUpdate
-
-
-Import-Module PSWindowsUpdate
-
-Get-WindowsUpdate
-Get-WUList
-
-Get-WUHistory
-
-Get-WindowsUpdate -Install -KBArticleID kb2267602
-Get-WindowsUpdate -Install -KBArticleID <KB_Article_ID>
-Install-WindowsUpdate -KBArticleID $updateToInstall.KBArticleID -AcceptAll -AutoReboot
-Install-WindowsUpdate -KBArticleID KBArticleID 
-
-
-
-
-############################
-
-
-
 
 #### ping a computer until it is reachable ####
 
@@ -159,7 +92,7 @@ if ($FileDialog.ShowDialog() -eq "OK") {
 # Define the folder path on the remote computer where to copy the install package
 $DestFolderPath = "C:\inst"
 # Read the list of remote computers from a file
-$ComputerName = "kgt-mi-ps"
+$ComputerName = "kgt-mi-kue843"
 
 $Session = New-PSSession -ComputerName $ComputerName -Credential $cred
     
@@ -243,7 +176,7 @@ if ($DialogResult -eq [System.Windows.Forms.DialogResult]::OK) {
 # Define the folder path on the remote computer where to copy the install package
 $DestFolderPath = "C:\inst"
 # Read the list of remote computers from a file
-$ComputerName = "kgt-mi-ps"
+$ComputerName = "kgt-p-240601"
 
 $Session = New-PSSession -ComputerName $ComputerName -Credential $cred
 
@@ -525,6 +458,8 @@ Register-ScheduledTask -TaskName "Install Windows Updates" -Action $action -Trig
 
 #################
 
+$PSVersionTable
+
 # alle tasks anzeigen
 Get-ScheduledTask
 
@@ -540,3 +475,139 @@ Get-ScheduledTask -TaskName "install windows updates" | fl *
 # trigger eines tasks anzeigen
 (Get-ScheduledTask -TaskName "install windows updates").Triggers
 
+# taks manuell starten
+Start-ScheduledTask -TaskName "install windows updates"
+
+# check if windowsupate is running
+Get-Process -Name wuauclt | Select-Object Id, ProcessName, StartTime
+
+# check if windowsupate is running
+Get-Service -Name wuauserv | Select-Object Status
+
+# disable scheduled task
+Disable-ScheduledTask -TaskName $taskName -ComputerName $computerName
+Disable-ScheduledTask -TaskName $taskName 
+Disable-ScheduledTask -TaskName "install windows updates"
+
+# enable scheduled task
+Enable-ScheduledTask -TaskName $taskName -ComputerName $computerName
+
+# completely remove a scheduled task
+Unregister-ScheduledTask -TaskName $taskName -ComputerName $computerName
+
+# smbshares anzeigen
+Get-SmbShare
+
+New-SmbShare -Name "inst" -Path "C:\inst" -FullAccess "Everyone" # not working
+New-SmbShare -Name "inst" -Path "C:\inst" -FullAccess "S-1-1-0" # not working
+New-SmbShare -Name "inst" -Path "C:\inst" -FullAccess "stadthagen\fel841"
+New-SmbShare -Name "inst" -Path "C:\inst" -FullAccess "Everyone" -Description "install files" -EncryptData $true
+
+Remove-SmbShare -Name "inst" -Force
+
+robocopy <local_file_path> \\remote_computer_name\c$\remote_file_path /mov /z
+robocopy c:\inst\ '\\kgt-mi-dem804\c$\inst' A1-INSTALLATIONSDATEIEN-TRIMBLE_NOVA_18-0.zip /z
+robocopy c:\inst\ '\\kgt-mi-dem804\inst' A1-INSTALLATIONSDATEIEN-TRIMBLE_NOVA_18-0.zip /z
+
+#####################
+
+# Define the remote computer name and the file to copy
+$remoteComputer = "kgt-mi-dem804"
+$localFilePath = "C:\Path\To\Local\File.txt"
+$remoteShareName = "inst"
+
+# Create a new SMB share on the remote computer
+Invoke-Command -ComputerName $remoteComputer -ScriptBlock {
+    New-SmbShare -Name $using:remoteShareName -Path "C:\inst" -FullAccess "stadthagen\fel841"
+} -Credential $cred
+
+# Copy the file to the remote share
+Copy-Item -Path $localFilePath -Destination "\\$remoteComputer\$remoteShareName"
+
+# Remove the SMB share on the remote computer
+Invoke-Command -ComputerName $remoteComputer -ScriptBlock {
+    Remove-SmbShare -Name $using:remoteShareName -Force
+} -Credential $cred
+
+#########################
+
+
+### create a local user
+New-LocalUser -Name <Username> -Password <Password> -FullName <FullName> -Description <Description>
+New-LocalUser -Name JohnDoe -Password (ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force) -FullName "John Doe" -Description "Local user account"
+New-LocalUser -Name kirchner -Password (ConvertTo-SecureString "16+kgt-mi-ps-09" -AsPlainText -Force)
+
+
+This will create a new local user account on the remote computer with the username JohnDoe, password P@ssw0rd, full name John Doe, and description Local user account.
+Note that you need to use the ConvertTo-SecureString cmdlet to convert the password to a secure string, as required by the New-LocalUser cmdlet.
+
+This would add the JohnDoe user to the Administrators group.
+Add-LocalGroupMember -Group "Administrators" -Member "JohnDoe"
+Add-LocalGroupMember -Group "Administratoren" -Member "kirchner" # Gruppen haben dann natuerlich deutsche Namen
+
+# lokale User anzeigen
+Get-LocalUser
+
+# To get a list of all user accounts, including their names, full names, and descriptions:
+Get-LocalUser | Select-Object Name, FullName, Description
+
+# To get a list of all enabled user accounts:
+Get-LocalUser | Where-Object {$_.Enabled -eq $true}
+
+# To get a list of all user accounts that are members of a specific group (e.g., "Administrators"):
+Get-LocalUser | Where-Object {$_.PrincipalSource -eq "Local" -and $_.GroupList -contains "Administrators"}
+
+# To get a list of all user accounts with their corresponding SID (Security Identifier):
+Get-LocalUser | Select-Object Name, SID
+
+# This will retrieve a list of all local groups on the remote computer.
+Get-LocalGroup
+
+# To get a list of all group names:
+Get-LocalGroup | Select-Object Name
+
+# To get a list of all groups that a specific user is a member of:
+Get-LocalGroup | Where-Object {$_.Name -in (Get-LocalUser -Name <Username>).GroupList}
+
+########################################
+
+$user = [Security.Principal.WindowsIdentity]::GetCurrent()
+
+Get-LocalGroupMember -Group "Administratoren" # working
+
+Remove-LocalGroupMember -Group "Administratoren" -Member "stadthagen\domänen-benutzer"
+
+Get-Module -ListAvailable PSWindowsUpdate
+
+
+Import-Module PSWindowsUpdate
+
+Get-WindowsUpdate
+Get-WUList
+
+Get-WUHistory
+
+Get-WindowsUpdate -Install -KBArticleID kb2267602
+Get-WindowsUpdate -Install -KBArticleID <KB_Article_ID>
+Install-WindowsUpdate -KBArticleID $updateToInstall.KBArticleID -AcceptAll -AutoReboot
+Install-WindowsUpdate -KBArticleID KBArticleID 
+
+# lest event-logs containing windows update
+Get-EventLog -LogName System -Source Microsoft-Windows-WindowsUpdateClient -Newest 40
+
+############################
+
+# alle installierten programme abfragen und in die zwischenablage kopieren
+Get-Package -ProviderName Programs,msi | Select-Object Name, Version | Sort Name | Clip
+
+############################
+
+Get-Process -Name "processname" | Select-Object -Property Name, Id, CPU
+Get-Process -Name "system" | Select-Object -Property Name, Id, CPU
+
+
+
+#############################
+
+# list all autostart programs
+Get-CimInstance Win32_StartupCommand | Select-Object Name, command, Location, User | Format-List 
