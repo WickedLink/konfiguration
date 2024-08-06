@@ -37,3 +37,10 @@ msiexec /i NovaSetup_x64.msi PATCH=NovaPatch_x64.msp /qn /norestart
 -> \\NOVAINSTALL%\dotnet-hosting-3.1.10\dotnet-hosting-3.1.10-win.exe /q /norestart
 - Installation Nova und falls vorhanden inkl. Patch (Die MSP-Datei ist die Patchdatei)
 -> msiexec /i "\\%NOVAINSTALL\Data\NovaSetup_x64.msi" PATCH="\\%NOVAINSTALL\NovaPatch_x64.msp" /qn /norestart
+
+
+##############################
+
+Firefox uninstall
+helper.exe /S 
+

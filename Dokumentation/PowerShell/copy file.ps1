@@ -21,6 +21,61 @@ Remove-PSSession $Session
 
 #######################################
 
+# datei mit dialog kopieren und ziel manuell auswählen
+
+# Load Windows Forms assembly
+Add-Type -AssemblyName System.Windows.Forms
+
+# Create an OpenFileDialog instance
+$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+
+# Set initial properties
+$OpenFileDialog.InitialDirectory = "C:\"
+$OpenFileDialog.Filter = "All files (*.*)|*.*"
+$OpenFileDialog.FilterIndex = 1
+$OpenFileDialog.Multiselect = $false
+
+# Show the dialog and get the selected file
+$DialogResult = $OpenFileDialog.ShowDialog()
+
+if ($DialogResult -eq [System.Windows.Forms.DialogResult]::OK) {
+    $FilePath = $OpenFileDialog.FileName
+} else {
+    Write-Host "File selection was cancelled." -ForegroundColor Red
+    exit
+}
+
+# Read the list of remote computers from a file
+$ComputerListFile = "c:\inst\computerlist.txt"
+$Computers = Get-Content -Path $ComputerListFile
+
+# Display the list of computers and ask the user to select one
+Write-Host "Select a computer from the list:"
+for ($i = 0; $i -lt $Computers.Count; $i++) {
+    Write-Host "[$($i + 1)] $($Computers[$i])"
+}
+
+$Selection = Read-Host "Enter the number of the computer you want to select"
+$SelectedComputer = $Computers[$Selection - 1]
+
+# Define the folder path on the remote computer where to copy the install package
+$DestFolderPath = "C:\inst"
+
+$Session = New-PSSession -ComputerName $SelectedComputer -Credential $cred
+
+Invoke-Command -Session $Session -ScriptBlock {
+    param($DestFolderPath)
+    if (!(Test-Path $DestFolderPath)) {
+        New-Item $DestFolderPath -ItemType Directory # | Out-Null
+    }
+} -ArgumentList $DestFolderPath
+
+Copy-Item $FilePath -Destination $DestFolderPath -ToSession $Session
+
+Remove-PSSession $Session
+
+
+
 ########################################
 
 
@@ -368,6 +423,7 @@ Remove-PSSession $Session
 ########################## get fileversion
 
 (Get-Item -Path "C:\Program Files\PDF24\pdf24.exe").VersionInfo.fileversion
+(Get-Item -Path "C:\Program Files\tracker software\pdf editor\pdfxedit.exe").VersionInfo.fileversion
 
 ##########################
 
@@ -491,6 +547,7 @@ Disable-ScheduledTask -TaskName "install windows updates"
 
 # enable scheduled task
 Enable-ScheduledTask -TaskName $taskName -ComputerName $computerName
+Enable-ScheduledTask -TaskName "install windows updates"
 
 # completely remove a scheduled task
 Unregister-ScheduledTask -TaskName $taskName -ComputerName $computerName
@@ -544,6 +601,9 @@ Note that you need to use the ConvertTo-SecureString cmdlet to convert the passw
 This would add the JohnDoe user to the Administrators group.
 Add-LocalGroupMember -Group "Administrators" -Member "JohnDoe"
 Add-LocalGroupMember -Group "Administratoren" -Member "kirchner" # Gruppen haben dann natuerlich deutsche Namen
+
+Add-LocalGroupMember -Group "Remotedesktopbenutzer" -Member "stadthagen\fel841" # working
+Add-LocalGroupMember -Group "Administratoren" -Member "stadthagen\fel841" # Gruppen haben dann natuerlich deutsche Namen
 
 # lokale User anzeigen
 Get-LocalUser
@@ -603,6 +663,7 @@ Get-Package -ProviderName Programs,msi | Select-Object Name, Version | Sort Name
 ############################
 
 Get-Process -Name "processname" | Select-Object -Property Name, Id, CPU
+Get-Process -Name "explorer" | Select-Object -Property Name, Id, CPU
 Get-Process -Name "system" | Select-Object -Property Name, Id, CPU
 
 
@@ -611,3 +672,436 @@ Get-Process -Name "system" | Select-Object -Property Name, Id, CPU
 
 # list all autostart programs
 Get-CimInstance Win32_StartupCommand | Select-Object Name, command, Location, User | Format-List 
+
+
+############################ copy file to remote pc per smb share
+
+
+# Load Windows Forms assembly
+Add-Type -AssemblyName System.Windows.Forms
+
+# Create an OpenFileDialog instance
+$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+
+# Set initial properties
+$OpenFileDialog.InitialDirectory = "C:\"
+$OpenFileDialog.Filter = "All files (*.*)|*.*"
+$OpenFileDialog.FilterIndex = 1
+$OpenFileDialog.Multiselect = $false
+
+# Show the dialog and get the selected file
+$DialogResult = $OpenFileDialog.ShowDialog()
+
+if ($DialogResult -eq [System.Windows.Forms.DialogResult]::OK) {
+    $FilePath = $OpenFileDialog.FileName
+} else {
+    Write-Host "File selection was cancelled." -ForegroundColor Red
+    exit
+}
+
+# Read the list of remote computers from a file
+$ComputerListFile = "c:\inst\computerlist.txt"
+$Computers = Get-Content -Path $ComputerListFile
+
+# Display the list of computers and ask the user to select one
+Write-Host "Select a computer from the list:"
+for ($i = 0; $i -lt $Computers.Count; $i++) {
+    Write-Host "[$($i + 1)] $($Computers[$i])"
+}
+
+$Selection = Read-Host "Enter the number of the computer you want to select"
+$SelectedComputer = $Computers[$Selection - 1]
+
+# Define the folder path on the remote computer where to copy the install package
+# $DestFolderPath = "\\$SelectedComputer\c$\inst"
+$DestFolderPath = "c:\inst"
+
+# Create a network share for the destination folder
+$ShareName = "inst_share"
+Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+    param($DestFolderPath, $ShareName)
+    New-SmbShare -Name $ShareName -Path $DestFolderPath -FullAccess "Jeder"
+} -ArgumentList $DestFolderPath, $ShareName -Credential $cred
+
+# Copy the file to the network share using Robocopy
+$SharePath = "\\$SelectedComputer\$ShareName"
+# Robocopy /copyall $FilePath $SharePath
+Robocopy $(Split-Path $FilePath) $SharePath $(Split-Path $FilePath -Leaf) /z
+
+# Remove the network share
+Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+    param($ShareName)
+    Remove-SmbShare -Name $ShareName -Force
+} -ArgumentList $ShareName -Credential $cred
+
+
+######################################
+
+New-SmbShare -Name "inst" -Path "C:\inst" -FullAccess "stadthagen\fel841"
+New-SmbShare -Name "inst" -Path $DestFolderPath -FullAccess "stadthagen\fel841"
+Remove-SmbShare -Name "inst" -Force
+$DestFolderPath = "\\kgt-mi-ps\c$\inst"
+$DestFolderPath = "c:\inst"
+robocopy c:\inst\ '\\kgt-mi-dem804\inst' A1-INSTALLATIONSDATEIEN-TRIMBLE_NOVA_18-0.zip /z
+Robocopy /copyall /mov $(Split-Path $FilePath) $SharePath $(Split-Path $FilePath -Leaf)
+
+
+##### uninstall software
+# Get a list of installed packages
+Get-Package
+$packages = Get-Package -Name <SoftwareName>
+$packages = Get-Package -Name "*pdf*"
+$packages = Get-Package -Name "*pdf24*"
+$packages = Get-Package -Name "*7-zip*"
+$packages = Get-Package -Name "*hardcopy*"
+$packages
+
+# Uninstall the package
+$packages | Uninstall-Package -Confirm:$false
+
+#############
+
+# download a file
+Invoke-WebRequest -Uri "https://7-zip.org/a/7z2407-x64.msi" -OutFile ".\7z2407-x64.msi"
+Invoke-WebRequest -Uri "https://jabraxpressonlineprdstor.blob.core.windows.net/jdo/JabraDirectSetup.exe" -OutFile ".\JabraDirectSetup.exe"
+Invoke-WebRequest -Uri "https://simaris-toolbox.siemens.cloud/download/suite/simaris-suite-installer.exe" -OutFile ".\simaris-suite-installer.exe"
+
+# delete a file
+Remove-Item -Path "example.txt" -Force
+
+# delete a folder
+Remove-Item -Path "C:\Path\To\MyFolder" -Recurse -Force
+
+# retrieve path variable
+$env:PATH
+$env:PATH -split ';'
+
+# test if .NET framework 4.6.2 is installed
+Test-Path -Path "C:\Windows\Microsoft.NET\Framework\v4.0.30319"
+
+# test if ms sql server compact edition 3.5 is installed
+Test-Path -Path "C:\Program Files\Microsoft SQL Server Compact Edition\v3.5"
+
+
+
+###################### copy file to remote pc per smb share and install if it's an msi
+
+# Load Windows Forms assembly
+Add-Type -AssemblyName System.Windows.Forms
+
+# Create an OpenFileDialog instance
+$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+
+# Set initial properties
+$OpenFileDialog.InitialDirectory = "C:\"
+$OpenFileDialog.Filter = "All files (*.*)|*.*"
+$OpenFileDialog.FilterIndex = 1
+$OpenFileDialog.Multiselect = $false
+
+# Show the dialog and get the selected file
+$DialogResult = $OpenFileDialog.ShowDialog()
+
+if ($DialogResult -eq [System.Windows.Forms.DialogResult]::OK) {
+    $FilePath = $OpenFileDialog.FileName
+} else {
+    Write-Host "File selection was cancelled." -ForegroundColor Red
+    exit
+}
+
+# Read the list of remote computers from a file
+$ComputerListFile = "c:\inst\computerlist.txt"
+$Computers = Get-Content -Path $ComputerListFile
+
+# Display the list of computers and ask the user to select one
+Write-Host "Select a computer from the list:"
+for ($i = 0; $i -lt $Computers.Count; $i++) {
+    Write-Host "[$($i + 1)] $($Computers[$i])"
+}
+
+$Selection = Read-Host "Enter the number of the computer you want to select"
+$SelectedComputer = $Computers[$Selection - 1]
+
+# Define the folder path on the remote computer where to copy the install package
+$DestFolderPath = "c:\inst"
+
+# Create a network share for the destination folder
+$ShareName = "inst_share"
+Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+    param($DestFolderPath, $ShareName)
+    New-SmbShare -Name $ShareName -Path $DestFolderPath -FullAccess "Jeder"
+} -ArgumentList $DestFolderPath, $ShareName -Credential $cred
+
+# Copy the file to the network share using Robocopy
+$SharePath = "\\$SelectedComputer\$ShareName"
+Robocopy $(Split-Path $FilePath) $SharePath $(Split-Path $FilePath -Leaf) /z
+
+# Check if the copied file is an MSI file
+# $CopiedFilePath = Join-Path $SharePath $(Split-Path $FilePath -Leaf)
+$CopiedFilePath = Join-Path $DestFolderPath $(Split-Path $FilePath -Leaf)
+if ($CopiedFilePath -like "*.msi") {
+    Write-Host "The copied file is an MSI file."
+    $InstallRemotely = Read-Host "Do you want to install it remotely? (yes/no)"
+    if ($InstallRemotely -eq "yes") {
+        Write-Host "Installing the MSI file on $SelectedComputer..."
+        Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+            param($CopiedFilePath)
+            # msiexec.exe /i $CopiedFilePath /quiet /norestart # working
+            # msiexec.exe /x $CopiedFilePath /quiet /norestart # not tested
+
+            $process = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $CopiedFilePath /quiet" -Wait -PassThru
+            if ($process.ExitCode -ne 0) {
+                Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
+            } else {
+                Write-Host "Installation complete." -ForegroundColor Green
+            }
+
+        } -ArgumentList $CopiedFilePath -Credential $cred
+        # Write-Host "Installation complete."
+    } else {
+        Write-Host "Not installing the MSI file remotely."
+    }
+} else {
+    Write-Host "The copied file is not an MSI file."
+}
+
+# Remove the network share
+Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+    param($ShareName)
+    Remove-SmbShare -Name $ShareName -Force
+} -ArgumentList $ShareName -Credential $cred
+
+############## funktioniert bis hier
+
+
+############### das gleiche um zip dateien erweitert
+
+
+
+
+# Load Windows Forms assembly
+Add-Type -AssemblyName System.Windows.Forms
+
+# Create an OpenFileDialog instance
+$OpenFileDialog = New-Object System.Windows.Forms.OpenFileDialog
+
+# Set initial properties
+$OpenFileDialog.InitialDirectory = "C:\"
+$OpenFileDialog.Filter = "All files (*.*)|*.*"
+$OpenFileDialog.FilterIndex = 1
+$OpenFileDialog.Multiselect = $false
+
+# Show the dialog and get the selected file
+$DialogResult = $OpenFileDialog.ShowDialog()
+
+if ($DialogResult -eq [System.Windows.Forms.DialogResult]::OK) {
+    $FilePath = $OpenFileDialog.FileName
+} else {
+    Write-Host "File selection was cancelled." -ForegroundColor Red
+    exit
+}
+
+# Read the list of remote computers from a file
+$ComputerListFile = "c:\inst\computerlist.txt"
+$Computers = Get-Content -Path $ComputerListFile
+
+if ($Computers.Count -eq 0) {
+    Write-Host "No computers found in the list." -ForegroundColor Red
+    exit
+} elseif ($Computers.Count -eq 1) {
+    $SelectedComputer = $Computers[0]
+    Write-Host "Only one computer in the list. Automatically selected: $SelectedComputer"
+} else {
+    # Display the list of computers and ask the user to select one
+    Write-Host "Select a computer from the list:"
+    for ($i = 0; $i -lt $Computers.Count; $i++) {
+        Write-Host "[$($i + 1)] $($Computers[$i])"
+    }
+
+    do {
+        $Selection = Read-Host "Enter the number of the computer you want to select"
+        
+        # Check if the input is a valid number and within range
+        $ValidSelection = $Selection -as [int]
+        if ($ValidSelection -and $ValidSelection -gt 0 -and $ValidSelection -le $Computers.Count) {
+            $SelectedComputer = $Computers[$ValidSelection - 1]  # Adjust for 0-based index
+            break
+        } else {
+            Write-Host "Invalid selection. Please enter a valid number." -ForegroundColor Red
+        }
+    } while ($true)
+}
+
+# Define the folder path on the remote computer where to copy the install package
+$DestFolderPath = "c:\inst"
+
+
+Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+    param($DestFolderPath)
+    if (!(Test-Path $DestFolderPath)) {
+        New-Item $DestFolderPath -ItemType Directory # | Out-Null
+    }
+} -ArgumentList $DestFolderPath -Credential $cred
+
+
+# Create a network share for the destination folder
+$ShareName = "inst_share"
+Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+    param($DestFolderPath, $ShareName)
+    New-SmbShare -Name $ShareName -Path $DestFolderPath -FullAccess "Jeder"
+} -ArgumentList $DestFolderPath, $ShareName -Credential $cred
+
+# Copy the file to the network share using Robocopy
+$SharePath = "\\$SelectedComputer\$ShareName"
+Robocopy $(Split-Path $FilePath) $SharePath $(Split-Path $FilePath -Leaf) /z
+
+# Check if the copied file is an MSI file or a ZIP archive
+$CopiedFilePath = Join-Path $DestFolderPath $(Split-Path $FilePath -Leaf)
+if ($CopiedFilePath -like "*.msi") {
+    Write-Host "The copied file is an MSI file."
+    $InstallRemotely = Read-Host "Do you want to install it remotely? (yes/no)"
+    if ($InstallRemotely -eq "yes") {
+        Write-Host "Installing the MSI file on $SelectedComputer..."
+        Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+            param($CopiedFilePath)
+            $process = Start-Process -FilePath "msiexec.exe" -ArgumentList "/i $CopiedFilePath /quiet /norestart" -Wait -PassThru
+            if ($process.ExitCode -ne 0) {
+                Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
+            } else {
+                Write-Host "Installation complete." -ForegroundColor Green
+            }
+        } -ArgumentList $CopiedFilePath -Credential $cred
+    } else {
+        Write-Host "Not installing the MSI file remotely."
+    }
+} elseif ($CopiedFilePath -like "*.zip") {
+    Write-Host "The copied file is a ZIP archive."
+    $UnzipRemotely = Read-Host "Do you want to unzip it remotely? (yes/no)"
+    if ($UnzipRemotely -eq "yes") {
+        # Determine the folder name based on the ZIP file name
+        $ZipFolderName = [System.IO.Path]::GetFileNameWithoutExtension($CopiedFilePath)
+        $UnzipDestPath = Join-Path $DestFolderPath $ZipFolderName
+
+        Write-Host "Unzipping the ZIP archive on $SelectedComputer to folder: $UnzipDestPath"
+        Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+            param($CopiedFilePath, $UnzipDestPath)
+            Add-Type -AssemblyName System.IO.Compression.FileSystem
+            [System.IO.Compression.ZipFile]::ExtractToDirectory($CopiedFilePath, $UnzipDestPath)
+            Write-Host "Unzipping complete." -ForegroundColor Green
+        } -ArgumentList $CopiedFilePath, $UnzipDestPath -Credential $cred
+    } else {
+        Write-Host "Not unzipping the ZIP archive remotely."
+    }
+} else {
+    Write-Host "The copied file is not an MSI file or a ZIP archive."
+}
+
+# Remove the network share
+Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
+    param($ShareName)
+    Remove-SmbShare -Name $ShareName -Force
+} -ArgumentList $ShareName -Credential $cred
+
+
+
+###########################
+
+
+# install dotnet hosting with switches and wait until execution has finished
+$exePath = "dotnet-hosting-3.1.28-win.exe"
+$arguments = "/q /norestart"
+$process = Start-Process -FilePath $exePath -ArgumentList $arguments -Wait -PassThru
+if ($process.ExitCode -ne 0) {
+    Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
+} else {
+    Write-Host "Installation complete." -ForegroundColor Green
+}
+
+# install SSCERuntime_x86-DEU.msi and wait until execution has finished
+$msiPath = Resolve-Path -Path ".\sql server compact edition\SSCERuntime_x86-DEU.msi"
+$arguments = "/i `"$msiPath`" /quiet /norestart"
+$process = Start-Process -FilePath "msiexec.exe" -ArgumentList $arguments -Wait -PassThru
+if ($process.ExitCode -ne 0) {
+    Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
+} else {
+    Write-Host "Installation complete." -ForegroundColor Green
+}
+
+# install SSCERuntime_x64-DEU.msi and wait until execution has finished
+$msiPath = Resolve-Path -Path ".\sql server compact edition\SSCERuntime_x64-DEU.msi"
+$arguments = "/i `"$msiPath`" /quiet /norestart"
+$process = Start-Process -FilePath "msiexec.exe" -ArgumentList $arguments -Wait -PassThru
+if ($process.ExitCode -ne 0) {
+    Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
+} else {
+    Write-Host "Installation complete." -ForegroundColor Green
+}
+
+# install dotnetfx with switches and wait until execution has finished
+$exePath = Resolve-Path -Path ".\dotnetfx472\dotnet-hosting-3.1.28-win.exe"
+$arguments = "/q /norestart"
+$process = Start-Process -FilePath $exePath -ArgumentList $arguments -Wait -PassThru
+if ($process.ExitCode -ne 0) {
+    Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
+} else {
+    Write-Host "Installation complete." -ForegroundColor Green
+}
+
+
+
+
+
+
+###########################
+
+# File manager script
+
+# Set the current directory
+$currDir = Get-Location
+
+# Function to display the directory contents
+function Show-Dir {
+  param ($dir)
+  Write-Host "Directory: $dir" -ForegroundColor Green
+  Get-ChildItem $dir | ForEach-Object {
+    if ($_.PSIsContainer) {
+      Write-Host "  $_" -ForegroundColor Cyan
+    } else {
+      Write-Host "  $_" -ForegroundColor White
+    }
+  }
+}
+
+# Function to navigate to a directory
+function Nav-Dir {
+  param ($dir)
+  Set-Location $dir
+  Show-Dir $dir
+}
+
+# Main loop
+while ($true) {
+  Show-Dir $currDir
+  $input = Read-Host "Enter a directory or command (q to quit)"
+  if ($input -eq "q") { break }
+  if (Test-Path $input) {
+    Nav-Dir $input
+  } else {
+    Write-Host "Invalid directory" -ForegroundColor Red
+  }
+}
+
+
+#####################
+Add-WindowsCapability -Name Rsat.ActiveDirectory.DS-LDS.Tools~~~~0.0.1.0 -Online
+
+######################
+
+
+$processName = "nextcloud"
+$process = Get-Process -Name $processName
+$filePath = $process.MainModule.FileName
+
+$fileVersionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($filePath)
+$versionNumber = $fileVersionInfo.FileVersion
+
+Write-Host "Version number of " + $processName + ": " + $versionNumber
