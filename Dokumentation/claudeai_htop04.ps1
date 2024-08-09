@@ -1,3 +1,5 @@
+# das aktivieren und deaktivieren der versionsnummern funktioniert noch nicht
+
 function Show-ProcessMonitor {
     param (
         [int]$Count = 20,

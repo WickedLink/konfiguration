@@ -604,6 +604,7 @@ Add-LocalGroupMember -Group "Administratoren" -Member "kirchner" # Gruppen haben
 
 Add-LocalGroupMember -Group "Remotedesktopbenutzer" -Member "stadthagen\fel841" # working
 Add-LocalGroupMember -Group "Administratoren" -Member "stadthagen\fel841" # Gruppen haben dann natuerlich deutsche Namen
+Add-LocalGroupMember -Group "Remotedesktopbenutzer" -Member "stadthagen\fel841" # Gruppen haben dann natuerlich deutsche Namen
 
 # lokale User anzeigen
 Get-LocalUser
@@ -631,11 +632,53 @@ Get-LocalGroup | Where-Object {$_.Name -in (Get-LocalUser -Name <Username>).Grou
 
 ########################################
 
+# Öffnen Sie eine Remote PowerShell-Sitzung
+# Enter-PSSession -ComputerName "RemoteComputerName" -Credential (Get-Credential)
+
+# Schritt 1: Remote Desktop in der Registrierung aktivieren
+Invoke-Command -ScriptBlock {
+    Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections" -Value 0
+}
+
+# Schritt 2: Remote Desktop-Dienst starten und auf Automatisch setzen
+Invoke-Command -ScriptBlock {
+    Get-Service -Name "TermService" | Set-Service -StartupType Automatic
+    Start-Service -Name "TermService"
+}
+
+# Schritt 3: Firewall-Regel hinzufügen, um RDP zuzulassen
+Invoke-Command -ScriptBlock {
+    Enable-NetFirewallRule -DisplayGroup "Remotedesktop"
+}
+
+# Bestätigen Sie, dass die Änderungen erfolgreich waren
+Invoke-Command -ScriptBlock {
+    $rdpStatus = Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name "fDenyTSConnections"
+    $firewallRule = Get-NetFirewallRule -DisplayGroup "Remotedesktop" | Get-NetFirewallRule | Where-Object { $_.Enabled -eq 'True' }
+
+    if ($rdpStatus.fDenyTSConnections -eq 0 -and $firewallRule) {
+        Write-Output "Remote Desktop ist aktiviert und die Firewall-Regeln sind konfiguriert."
+    } else {
+        Write-Output "Es gab ein Problem bei der Konfiguration von Remote Desktop oder der Firewall-Regeln."
+    }
+}
+
+# Beenden Sie die Remote PowerShell-Sitzung
+# Exit-PSSession
+
+
+
+########################################
+
 $user = [Security.Principal.WindowsIdentity]::GetCurrent()
 
 Get-LocalGroupMember -Group "Administratoren" # working
 
 Remove-LocalGroupMember -Group "Administratoren" -Member "stadthagen\domänen-benutzer"
+
+### rdp stuff
+Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Type DWORD -Value 0 -Force
+Get-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' | Select-Object -ExpandProperty fDenyTSConnections
 
 Get-Module -ListAvailable PSWindowsUpdate
 
@@ -659,6 +702,7 @@ Get-EventLog -LogName System -Source Microsoft-Windows-WindowsUpdateClient -Newe
 
 # alle installierten programme abfragen und in die zwischenablage kopieren
 Get-Package -ProviderName Programs,msi | Select-Object Name, Version | Sort Name | Clip
+Get-Package -ProviderName Programs,msi | Select-Object Name, Version | Sort Name
 
 ############################
 
@@ -753,7 +797,8 @@ $packages = Get-Package -Name <SoftwareName>
 $packages = Get-Package -Name "*pdf*"
 $packages = Get-Package -Name "*pdf24*"
 $packages = Get-Package -Name "*7-zip*"
-$packages = Get-Package -Name "*hardcopy*"
+$packages = Get-Package -Name "*firefox*"
+$packages = Get-Package -Name "*else*"
 $packages
 
 # Uninstall the package
@@ -1006,51 +1051,6 @@ Invoke-Command -ComputerName $SelectedComputer -ScriptBlock {
 ###########################
 
 
-# install dotnet hosting with switches and wait until execution has finished
-$exePath = "dotnet-hosting-3.1.28-win.exe"
-$arguments = "/q /norestart"
-$process = Start-Process -FilePath $exePath -ArgumentList $arguments -Wait -PassThru
-if ($process.ExitCode -ne 0) {
-    Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
-} else {
-    Write-Host "Installation complete." -ForegroundColor Green
-}
-
-# install SSCERuntime_x86-DEU.msi and wait until execution has finished
-$msiPath = Resolve-Path -Path ".\sql server compact edition\SSCERuntime_x86-DEU.msi"
-$arguments = "/i `"$msiPath`" /quiet /norestart"
-$process = Start-Process -FilePath "msiexec.exe" -ArgumentList $arguments -Wait -PassThru
-if ($process.ExitCode -ne 0) {
-    Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
-} else {
-    Write-Host "Installation complete." -ForegroundColor Green
-}
-
-# install SSCERuntime_x64-DEU.msi and wait until execution has finished
-$msiPath = Resolve-Path -Path ".\sql server compact edition\SSCERuntime_x64-DEU.msi"
-$arguments = "/i `"$msiPath`" /quiet /norestart"
-$process = Start-Process -FilePath "msiexec.exe" -ArgumentList $arguments -Wait -PassThru
-if ($process.ExitCode -ne 0) {
-    Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
-} else {
-    Write-Host "Installation complete." -ForegroundColor Green
-}
-
-# install dotnetfx with switches and wait until execution has finished
-$exePath = Resolve-Path -Path ".\dotnetfx472\dotnet-hosting-3.1.28-win.exe"
-$arguments = "/q /norestart"
-$process = Start-Process -FilePath $exePath -ArgumentList $arguments -Wait -PassThru
-if ($process.ExitCode -ne 0) {
-    Write-Host "Installation failed with exit code $($process.ExitCode)" -ForegroundColor Red
-} else {
-    Write-Host "Installation complete." -ForegroundColor Green
-}
-
-
-
-
-
-
 ###########################
 
 # File manager script
@@ -1105,3 +1105,5 @@ $fileVersionInfo = [System.Diagnostics.FileVersionInfo]::GetVersionInfo($filePat
 $versionNumber = $fileVersionInfo.FileVersion
 
 Write-Host "Version number of " + $processName + ": " + $versionNumber
+
+###########################

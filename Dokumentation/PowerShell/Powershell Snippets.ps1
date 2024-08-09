@@ -47,6 +47,7 @@ Get-ChildItem Env:\COMPUTERNAME
 
 # Windows Uptime auslesen
 (Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName kgt-mi-fel841k).LastBootupTime
+(Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName kgt-p-fs2).LastBootupTime
 
 # Rechner umbenennen
 Rename-Computer -NewName NEUER NAME
