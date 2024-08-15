@@ -688,7 +688,27 @@ Import-Module PSWindowsUpdate
 Get-WindowsUpdate
 Get-WUList
 
+Get-WindowsUpdate -Category "CriticalUpdates", "SecurityUpdates", "DefinitionUpdates", "FeaturePacks", "Upgrades"
+Get-WindowsUpdate -Category "security"
+
+# funktionieren:
+Get-WindowsUpdate -Category "security" -MicrosoftUpdate
+Get-WindowsUpdate -Category "driver" -MicrosoftUpdate  
+Get-WindowsUpdate -Category "update" -MicrosoftUpdate # sieht gut aus
+
+# from claude
+"Security Updates"
+"Critical Updates"
+"Definition Updates"
+"Updates"
+"Feature Packs"
+"Service Packs"
+"Tools"
+"Drivers"
+
 Get-WUHistory
+
+Get-WUSettings
 
 Get-WindowsUpdate -Install -KBArticleID kb2267602
 Get-WindowsUpdate -Install -KBArticleID <KB_Article_ID>
@@ -797,7 +817,7 @@ $packages = Get-Package -Name <SoftwareName>
 $packages = Get-Package -Name "*pdf*"
 $packages = Get-Package -Name "*pdf24*"
 $packages = Get-Package -Name "*7-zip*"
-$packages = Get-Package -Name "*firefox*"
+$packages = Get-Package -Name "*nova 16*"
 $packages = Get-Package -Name "*else*"
 $packages
 

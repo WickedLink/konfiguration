@@ -80,6 +80,9 @@ function Install-UpdatesAsSystem($computerName) {
 Clear-Host
 Write-Host "Windows Update Remote Management Script" -ForegroundColor Magenta
 Write-Host "=======================================" -ForegroundColor Magenta
+
+$mode = Read-Host "Choose operation mode:`n1. Check for updates`n2. Check and install updates`nEnter your choice (1 or 2)"
+
 $computers = Get-Content -Path "C:\inst\ComputerList_updates.txt"
 
 foreach ($computer in $computers) {
@@ -91,11 +94,13 @@ foreach ($computer in $computers) {
             Write-Host "  Available updates for ${computer}:" -ForegroundColor Green
             $updates | Format-Table -AutoSize | Out-Host
             
-            $install = Read-Host "  Do you want to install updates on ${computer}? (Y/N)"
-            if ($install -eq "Y") {
-                Install-UpdatesAsSystem $computer
-            } else {
-                Write-Host "  Skipping update installation for ${computer}." -ForegroundColor Yellow
+            if ($mode -eq "2") {
+                $install = Read-Host "  Do you want to install updates on ${computer}? (Y/N)"
+                if ($install -eq "Y") {
+                    Install-UpdatesAsSystem $computer
+                } else {
+                    Write-Host "  Skipping update installation for ${computer}." -ForegroundColor Yellow
+                }
             }
         } else {
             Write-Host "  No updates available for ${computer}." -ForegroundColor Green
@@ -104,5 +109,21 @@ foreach ($computer in $computers) {
     Write-Host "`n  ----------------------------------------" -ForegroundColor Gray
 }
 
-Write-Host "`nScript execution completed." -ForegroundColor Magenta
+if ($mode -eq "1") {
+    $timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+    $outputFile = "C:\inst\UpdateReport_$timestamp.txt"
+    $computers | ForEach-Object {
+        $computerName = $_
+        $updates = Get-AvailableUpdates $computerName
+        if ($updates.Count -gt 0) {
+            "Updates for ${computerName}:" | Out-File -Append -FilePath $outputFile
+            $updates | Format-Table -AutoSize | Out-File -Append -FilePath $outputFile
+            "`n" | Out-File -Append -FilePath $outputFile
+        } else {
+            "No updates available for $computerName`n" | Out-File -Append -FilePath $outputFile
+        }
+    }
+    Write-Host "Update report saved to $outputFile" -ForegroundColor Cyan
+}
 
+Write-Host "`nScript execution completed." -ForegroundColor Magenta

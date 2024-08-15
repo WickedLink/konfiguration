@@ -46,11 +46,35 @@ Get-WmiObject win32_product -ComputerName kgt-mi-let863 | Select-Object name, ve
 Get-ChildItem Env:\COMPUTERNAME
 
 # Windows Uptime auslesen
-(Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName kgt-mi-fel841k).LastBootupTime
+(Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName "kgt-mi-dem804-2").LastBootupTime
 (Get-Date) – (Get-CimInstance Win32_OperatingSystem -ComputerName kgt-p-fs2).LastBootupTime
 
 # Rechner umbenennen
 Rename-Computer -NewName NEUER NAME
+
+# dns-server herausfinden
+Get-DnsClientServerAddress
+
+# dns-server auf standard (dhcp) zurücksetzen
+Set-DnsClientServerAddress -InterfaceAlias "WLAN" -ResetServerAddresses
+
+# dns-server einstellen
+# DNS-Server für den Adapter "Ethernet" ändern
+$interfaceAlias = "Ethernet"
+$dnsServers = "8.8.8.8", "8.8.4.4"
+$dnsServers = "192.168.1.7", "192.168.115.2", "8.8.8.8"
+
+Set-DnsClientServerAddress -InterfaceAlias $interfaceAlias -ServerAddresses $dnsServers
+
+# ipconfig alternativen
+Get-NetIPAddress
+Get-NetIPAddress -InterfaceAlias ethernet -AddressFamily ipv4
+Get-NetIPConfiguration
+Get-NetAdapter
+Get-NetRoute
+
+
+
 
 # Rechner neu starten
 Restart-Computer -ComputerName kgt-mi-bar873 -Credential

@@ -80,29 +80,46 @@ function Install-UpdatesAsSystem($computerName) {
 Clear-Host
 Write-Host "Windows Update Remote Management Script" -ForegroundColor Magenta
 Write-Host "=======================================" -ForegroundColor Magenta
+
+$mode = Read-Host "Choose operation mode:`n1. Check for updates`n2. Check and install updates`nEnter your choice (1 or 2)"
+
 $computers = Get-Content -Path "C:\inst\ComputerList_updates.txt"
+$timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$outputFile = "C:\inst\UpdateReport_$timestamp.txt"
 
 foreach ($computer in $computers) {
     Write-Host "`nProcessing computer: ${computer}" -ForegroundColor Blue
     if (Test-ComputerOnline $computer) {
-        $updates = Get-AvailableUpdates $computer
-        
-        if ($updates.Count -gt 0) {
-            Write-Host "  Available updates for ${computer}:" -ForegroundColor Green
-            $updates | Format-Table -AutoSize | Out-Host
+        try {
+            $updates = Get-AvailableUpdates $computer
             
-            $install = Read-Host "  Do you want to install updates on ${computer}? (Y/N)"
-            if ($install -eq "Y") {
-                Install-UpdatesAsSystem $computer
+            if ($updates.Count -gt 0) {
+                Write-Host "  Available updates for ${computer}:" -ForegroundColor Green
+                $updates | Format-Table -AutoSize | Out-Host
+                
+                "Updates for ${computer}:" | Out-File -Append -FilePath $outputFile
+                $updates | Format-Table -AutoSize | Out-File -Append -FilePath $outputFile
+                "`n" | Out-File -Append -FilePath $outputFile
+                
+                if ($mode -eq "2") {
+                    $install = Read-Host "  Do you want to install updates on ${computer}? (Y/N)"
+                    if ($install -eq "Y") {
+                        Install-UpdatesAsSystem $computer
+                    } else {
+                        Write-Host "  Skipping update installation for ${computer}." -ForegroundColor Yellow
+                    }
+                }
             } else {
-                Write-Host "  Skipping update installation for ${computer}." -ForegroundColor Yellow
+                Write-Host "  No updates available for ${computer}." -ForegroundColor Green
+                "No updates available for $computer`n" | Out-File -Append -FilePath $outputFile
             }
-        } else {
-            Write-Host "  No updates available for ${computer}." -ForegroundColor Green
+        } catch {
+            Write-Host "  Error processing ${computer}: $_" -ForegroundColor Red
+            "Error processing ${computer}: $_`n" | Out-File -Append -FilePath $outputFile
         }
     }
     Write-Host "`n  ----------------------------------------" -ForegroundColor Gray
 }
 
+Write-Host "Update report saved to $outputFile" -ForegroundColor Cyan
 Write-Host "`nScript execution completed." -ForegroundColor Magenta
-
