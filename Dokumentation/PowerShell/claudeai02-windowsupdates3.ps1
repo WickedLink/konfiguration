@@ -44,14 +44,17 @@ function Get-AvailableUpdates($computerName) {
 
         # Get Windows updates
         # Get-WindowsUpdate -MicrosoftUpdate
-        Get-WindowsUpdate -Category "update" -MicrosoftUpdate
+        # Get-WindowsUpdate -Category "update" -MicrosoftUpdate
+        # Get-WindowsUpdate -Category "update" -WindowsUpdate
+        Get-WindowsUpdate -NotCategory drivers
     }
 }
 
 # Function to create and run a scheduled task for installing updates
 function Install-UpdatesAsSystem($computerName) {
     $taskName = "InstallWindowsUpdates_$(Get-Date -Format 'yyyyMMdd_HHmmss')"
-    $action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-NoProfile -WindowStyle Hidden -Command `"Set-ExecutionPolicy Bypass -Scope Process -Force; Import-Module PSWindowsUpdate; Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot | Out-File C:\Windows\Temp\WindowsUpdateLog.txt; Unregister-ScheduledTask -TaskName '$taskName' -Confirm:`$false`""
+    # $action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-NoProfile -WindowStyle Hidden -Command `"Set-ExecutionPolicy Bypass -Scope Process -Force; Import-Module PSWindowsUpdate; Install-WindowsUpdate -MicrosoftUpdate -AcceptAll -IgnoreReboot | Out-File C:\Windows\Temp\WindowsUpdateLog.txt; Unregister-ScheduledTask -TaskName '$taskName' -Confirm:`$false`""
+    $action = New-ScheduledTaskAction -Execute 'PowerShell.exe' -Argument "-NoProfile -WindowStyle Hidden -Command `"Set-ExecutionPolicy Bypass -Scope Process -Force; Import-Module PSWindowsUpdate; Install-WindowsUpdate -NotCategory drivers -AcceptAll -IgnoreReboot | Out-File C:\Windows\Temp\WindowsUpdateLog.txt; Unregister-ScheduledTask -TaskName '$taskName' -Confirm:`$false`""
     $trigger = New-ScheduledTaskTrigger -Once -At (Get-Date).AddMinutes(1)
     $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
     $task = New-ScheduledTask -Action $action -Trigger $trigger -Principal $principal
