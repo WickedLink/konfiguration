@@ -1,6 +1,6 @@
-$subnet = "192.168.1" # minden
+# $subnet = "192.168.1" # minden
 # $subnet = "192.168.15" # potsdam
-# $subnet = "192.168.19" # bremen
+$subnet = "192.168.19" # bremen
 $range = 1..254
 
 Write-Host "Starting network scan on subnet $subnet.0/24..." -ForegroundColor Cyan
