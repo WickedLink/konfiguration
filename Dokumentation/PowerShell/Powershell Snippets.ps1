@@ -131,3 +131,10 @@ $computerName = (Resolve-DnsName -Name 192.168.1.46 -Type PTR).NameHost
 $AutoUpdates = New-Object -ComObject "Microsoft.Update.AutoUpdate"
 $AutoUpdates.DetectNow()
 
+############
+
+# bitlocker
+
+$BitlockerVolume = Get-BitLockerVolume -MountPoint C
+$RecoveryKey = ($BitlockerVolume.KeyProtector).RecoveryPassword
+Write-Output "The drive C has a recovery key $RecoveryKey."

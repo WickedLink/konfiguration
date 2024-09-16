@@ -44,7 +44,7 @@ if ($DialogResult -eq [System.Windows.Forms.DialogResult]::OK) {
 }
 
 # Read the list of remote computers from a file
-$ComputerListFile = "c:\inst\computerlist.txt"
+$ComputerListFile = "c:\inst\computerlist_all.txt"
 Write-ColorfulMessage "Reading computer list from: $ComputerListFile" "Yellow"
 $Computers = Get-Content -Path $ComputerListFile
 
