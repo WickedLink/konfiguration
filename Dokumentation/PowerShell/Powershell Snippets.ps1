@@ -164,8 +164,30 @@ Set-ADUser  -Identity "bog874" -ScriptPath "KGT-User_MI_Zeichner.bat" -Credentia
 $newPassword = Read-Host "Enter new password" -AsSecureString
 Set-ADAccountPassword -Identity "shelltest" -NewPassword $newPassword -Reset -Credential $cred
 
-# list ad-groups
+# list ad-usergroups
 Get-ADGroup -Filter *
 Get-ADGroup -Filter {Name -like "kgt*"}
 Get-ADGroup -Filter {Name -like "kgt*"} | Select-Object Name
+
+# list all computers of a domain
+Get-ADComputer -Filter *
+# Get-ADComputer -Filter {OperatingSystem -like "*Windows 10*"} -Properties Name, OperatingSystem, LastLogonDate
+
+# search for computers by name
+Get-ADComputer -Filter {Name -like "kgt*"}
+
+
+Get-ADComputer -SearchBase "OU=Computers,OU=MyDepartment,DC=mydomain,DC=com" -Filter *
+Get-ADComputer -SearchBase "OU=KGT-Rechner,OU=KGT,DC=stadthagen,DC=kirchner-ingenieure,DC=de" -Filter * # working
+
+Get-ADComputer -Filter {OperatingSystem -like "*Windows 10*"} -Properties Name, OperatingSystem, LastLogonDate # working
+Get-ADComputer -SearchBase "OU=KGT-Rechner,OU=KGT,DC=stadthagen,DC=kirchner-ingenieure,DC=de" -Filter {OperatingSystem -like "*Windows 10*"} -Properties Name, OperatingSystem, LastLogonDate 
+
+# get the ad-ou's
+Get-ADOrganizationalUnit -Filter {Name -like "kgt*"} # working
+Get-ADOrganizationalUnit -Filter * # working
+Get-ADOrganizationalUnit -Filter * | Select-Object Name # working
+
+
+
 
