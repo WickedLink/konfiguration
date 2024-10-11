@@ -1,5 +1,6 @@
 # Set the path to the text file containing computer names
-$computerListPath = "C:\inst\ComputerList.txt"
+#$computerListPath = "C:\inst\ComputerList.txt"
+$computerListPath = "C:\inst\ComputerList_all.txt"
 
 # Set the path for the output CSV file
 $outputCsvPath = "C:\inst\SoftwareInventory.csv"

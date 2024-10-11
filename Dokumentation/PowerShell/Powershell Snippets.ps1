@@ -138,3 +138,34 @@ $AutoUpdates.DetectNow()
 $BitlockerVolume = Get-BitLockerVolume -MountPoint C
 $RecoveryKey = ($BitlockerVolume.KeyProtector).RecoveryPassword
 Write-Output "The drive C has a recovery key $RecoveryKey."
+
+# startup script of a specific domain user
+
+# zuerst: 
+Import-Module ActiveDirectory
+
+Get-ADUser  -Identity <username> -Properties ScriptPath | Select-Object ScriptPath
+
+# wenn auch der inhalt des scripts angezeigt werden soll
+$scriptPath = (Get-ADUser  -Identity fel841 -Properties ScriptPath).ScriptPath
+# Get-Content -Path $scriptPath
+Get-Content -Path \\kgt-minden-dc\sysvol\stadthagen.kirchner-ingenieure.de\scripts\$scriptPath
+
+# startup scripts of a group
+Get-ADUser  -LDAPFilter "(objectClass=user)" -SearchScope Subtree -SearchBase "OU=KGT,DC=stadthagen,DC=kirchner-ingenieure,DC=de" -Properties ScriptPath | Select-Object Name, ScriptPath
+Get-ADUser  -LDAPFilter "(objectClass=user)" -SearchScope Subtree -SearchBase "OU=KGT,DC=stadthagen,DC=kirchner-ingenieure,DC=de" -Properties ScriptPath | Select-Object Name, samaccountname, ScriptPath | Sort-Object Name | Export-CSV -Path "C:\inst\scriptpaths.csv" -NoTypeInformation
+
+# set / change the script
+Set-ADUser  -Identity "john.doe" -ScriptPath "C:\Scripts\newscript.bat"
+Set-ADUser  -Identity "shelltest" -ScriptPath "KGT-User_MI_Zeichner.bat" -Credential $cred
+Set-ADUser  -Identity "bog874" -ScriptPath "KGT-User_MI_Zeichner.bat" -Credential $cred
+
+# change the password of a domain user
+$newPassword = Read-Host "Enter new password" -AsSecureString
+Set-ADAccountPassword -Identity "shelltest" -NewPassword $newPassword -Reset -Credential $cred
+
+# list ad-groups
+Get-ADGroup -Filter *
+Get-ADGroup -Filter {Name -like "kgt*"}
+Get-ADGroup -Filter {Name -like "kgt*"} | Select-Object Name
+
