@@ -1,13 +1,14 @@
-# Enhanced BitLocker Status Check Script
+# Enhanced BitLocker Status Check Script with CSV Update
 # This script checks BitLocker status on remote computers and retrieves recovery keys
+# It updates an existing CSV file or creates a new one if it doesn't exist
 
 # Import required modules
 Import-Module BitLocker
 Add-Type -AssemblyName System.Windows.Forms
 
 # Define variables for input and output files
-$computerListFile = "C:\inst\computerlist_all.txt"
-$outputFile = "C:\inst\bitlocker_results_all2.csv"
+$computerListFile = "C:\inst\computerlist_hb.txt"
+$outputFile = "C:\inst\bitlocker_results_hb.csv"
 
 # Ensure $cred is defined before running this script
 # $cred = Get-Credential
@@ -17,7 +18,7 @@ function Show-Banner {
     Clear-Host
     Write-Host "`n`n" -NoNewline
     Write-Host "========================================" -ForegroundColor Cyan
-    Write-Host "   BitLocker Status Check Script v2.0   " -ForegroundColor Yellow
+    Write-Host "   BitLocker Status Check Script v3.0   " -ForegroundColor Yellow
     Write-Host "========================================" -ForegroundColor Cyan
     Write-Host "`n"
 }
@@ -66,19 +67,32 @@ function Show-Progress {
 # Main script execution
 Show-Banner
 
-# Read computer list from file
-Write-Host "Reading computer list from $computerListFile..." -ForegroundColor Green
-$computers = Get-Content -Path $computerListFile
-$totalComputers = $computers.Count
-Write-Host "Found $totalComputers computers in the list." -ForegroundColor Green
+# Check if the CSV file exists
+$existingResults = @()
+if (Test-Path $outputFile) {
+    Write-Host "Existing CSV file found. Reading data..." -ForegroundColor Green
+    $existingResults = Import-Csv -Path $outputFile
+    Write-Host "Found $(($existingResults | Measure-Object).Count) existing entries." -ForegroundColor Green
+    
+    # Filter out computers that are already online
+    $computersToCheck = $existingResults | Where-Object { $_.Status -ne "Online" } | Select-Object -ExpandProperty ComputerName
+    Write-Host "$(($computersToCheck | Measure-Object).Count) computers need to be rechecked." -ForegroundColor Yellow
+} else {
+    Write-Host "No existing CSV file found. Will create a new one." -ForegroundColor Yellow
+    # Read all computers from the list file
+    $computersToCheck = Get-Content -Path $computerListFile
+}
+
+$totalComputers = $computersToCheck.Count
+Write-Host "Total computers to process: $totalComputers" -ForegroundColor Green
 
 # Initialize results array
 $results = @()
 
 # Process each computer
 Write-Host "`nProcessing computers:" -ForegroundColor Yellow
-for ($i = 0; $i -lt $computers.Count; $i++) {
-    $computer = $computers[$i]
+for ($i = 0; $i -lt $computersToCheck.Count; $i++) {
+    $computer = $computersToCheck[$i]
     $percentComplete = [math]::Round(($i + 1) / $totalComputers * 100)
     
     Show-Progress -PercentComplete $percentComplete -Status "Processing $computer ($($i+1)/$totalComputers)"
@@ -91,7 +105,6 @@ for ($i = 0; $i -lt $computers.Count; $i++) {
         
         # Get BitLocker info using the provided credentials
         $bitlockerInfo = Invoke-Command -ComputerName $computer -Credential $cred -ScriptBlock ${function:Get-BitLockerInfo} -ArgumentList $computer
-        $results += $bitlockerInfo
         
         # Display BitLocker status
         if ($bitlockerInfo.BitLockerEnabled) {
@@ -104,7 +117,7 @@ for ($i = 0; $i -lt $computers.Count; $i++) {
         }
     } else {
         Write-Host "Offline" -ForegroundColor Red
-        $results += [PSCustomObject]@{
+        $bitlockerInfo = [PSCustomObject]@{
             ComputerName = $computer
             Status = "Offline"
             BitLockerEnabled = "Unknown"
@@ -112,22 +125,32 @@ for ($i = 0; $i -lt $computers.Count; $i++) {
         }
     }
     
+    # Update existing results or add new entry
+    $existingEntry = $existingResults | Where-Object { $_.ComputerName -eq $computer }
+    if ($existingEntry) {
+        $existingEntry.Status = $bitlockerInfo.Status
+        $existingEntry.BitLockerEnabled = $bitlockerInfo.BitLockerEnabled
+        $existingEntry.RecoveryKey = $bitlockerInfo.RecoveryKey
+    } else {
+        $existingResults += $bitlockerInfo
+    }
+    
     Write-Host ""
 }
 
-# Export results to CSV
-Write-Host "`nExporting results to CSV..." -ForegroundColor Green
-$results | Export-Csv -Path $outputFile -NoTypeInformation
+# Export updated results to CSV
+Write-Host "`nExporting updated results to CSV..." -ForegroundColor Green
+$existingResults | Export-Csv -Path $outputFile -NoTypeInformation
 
 Write-Host "`nResults have been saved to $outputFile" -ForegroundColor Cyan
 
 # Display summary
-$onlineCount = ($results | Where-Object { $_.Status -eq "Online" }).Count
-$offlineCount = ($results | Where-Object { $_.Status -eq "Offline" }).Count
-$enabledCount = ($results | Where-Object { $_.BitLockerEnabled -eq $true }).Count
+$onlineCount = ($existingResults | Where-Object { $_.Status -eq "Online" }).Count
+$offlineCount = ($existingResults | Where-Object { $_.Status -eq "Offline" }).Count
+$enabledCount = ($existingResults | Where-Object { $_.BitLockerEnabled -eq $true }).Count
 
 Write-Host "`nSummary:" -ForegroundColor Yellow
-Write-Host "  Total computers: $totalComputers" -ForegroundColor White
+Write-Host "  Total computers: $(($existingResults | Measure-Object).Count)" -ForegroundColor White
 Write-Host "  Online: $onlineCount" -ForegroundColor Green
 Write-Host "  Offline: $offlineCount" -ForegroundColor Red
 Write-Host "  BitLocker Enabled: $enabledCount" -ForegroundColor Cyan
