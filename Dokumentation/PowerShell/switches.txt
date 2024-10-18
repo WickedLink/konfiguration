@@ -44,3 +44,8 @@ msiexec /i NovaSetup_x64.msi PATCH=NovaPatch_x64.msp /qn /norestart
 Firefox uninstall
 helper.exe /S 
 
+##############################
+
+Java 8
+jre-8u431-windows-x64.exe /s 
+
