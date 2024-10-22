@@ -2,10 +2,10 @@
 # $cred = Get-Credential -Message "Enter credentials with necessary permissions"
 
 # Read computer names from a text file
-# $computers = Get-Content -Path "C:\inst\computerlist_all.txt"
+$computers = Get-Content -Path "C:\inst\computerlist_all.txt"
 # $computers = Get-Content -Path "C:\inst\computerlist_mi.txt"
 # $computers = Get-Content -Path "C:\inst\computerlist_p.txt"
-$computers = Get-Content -Path "C:\inst\computerlist_hb.txt"
+# $computers = Get-Content -Path "C:\inst\computerlist_hb.txt"
 
 # Function to get uptime
 function Get-Uptime {

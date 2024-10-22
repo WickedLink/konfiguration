@@ -49,3 +49,13 @@ helper.exe /S
 Java 8
 jre-8u431-windows-x64.exe /s 
 
+##############################
+
+.NET 4.8
+NDP48-x86-x64-AllOS-ENU.exe /q /norestart
+
+##############################
+
+
+VC_redist.x64_2017.exe /install /quiet /norestart
+
