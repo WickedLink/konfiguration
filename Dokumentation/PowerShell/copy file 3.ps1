@@ -43,6 +43,11 @@ if ($DialogResult -eq [System.Windows.Forms.DialogResult]::OK) {
     exit
 }
 
+# Set-AudioDevice -Index 1
+# [System.Media.SystemSounds]::Asterisk.Play()
+# Set-AudioDevice -Index 5
+
+
 # Read the list of remote computers from a file
 $ComputerListFile = "c:\inst\computerlist_all.txt"
 Write-ColorfulMessage "Reading computer list from: $ComputerListFile" "Yellow"
@@ -75,6 +80,10 @@ if ($Computers.Count -eq 0) {
         }
     } while ($true)
 }
+
+
+# [System.Media.SystemSounds]::Asterisk.Play()
+
 
 # Define the folder path on the remote computer where to copy the install package
 $DestFolderPath = "c:\inst"
