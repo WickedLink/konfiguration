@@ -7,7 +7,7 @@ Add-Type -AssemblyName System.Windows.Forms
 
 # Define variables for input and output files
 $computerListFile = "C:\inst\computerlist_all.txt"
-$outputFile = "C:\inst\bitlocker_results_all3.csv"
+$outputFile = "C:\inst\bitlocker_results_all4.csv"
 
 # Ensure $cred is defined before running this script
 # $cred = Get-Credential
