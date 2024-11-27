@@ -1,6 +1,6 @@
-# $subnet = "192.168.1" # minden
+$subnet = "192.168.1" # minden
 # $subnet = "192.168.15" # potsdam
-$subnet = "192.168.16" # kassel
+# $subnet = "192.168.16" # kassel
 # $subnet = "192.168.19" # bremen
 $range = 1..254
 
