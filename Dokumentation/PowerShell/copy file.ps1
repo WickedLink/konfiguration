@@ -592,7 +592,7 @@ Invoke-Command -ComputerName $remoteComputer -ScriptBlock {
 ### create a local user
 New-LocalUser -Name <Username> -Password <Password> -FullName <FullName> -Description <Description>
 New-LocalUser -Name JohnDoe -Password (ConvertTo-SecureString "P@ssw0rd" -AsPlainText -Force) -FullName "John Doe" -Description "Local user account"
-New-LocalUser -Name kirchner -Password (ConvertTo-SecureString "16+kgt-mi-ps-09" -AsPlainText -Force)
+New-LocalUser -Name kirchner -Password (ConvertTo-SecureString "16+kgt-p-jer829-09" -AsPlainText -Force)
 
 
 This will create a new local user account on the remote computer with the username JohnDoe, password P@ssw0rd, full name John Doe, and description Local user account.
@@ -601,6 +601,7 @@ Note that you need to use the ConvertTo-SecureString cmdlet to convert the passw
 This would add the JohnDoe user to the Administrators group.
 Add-LocalGroupMember -Group "Administrators" -Member "JohnDoe"
 Add-LocalGroupMember -Group "Administratoren" -Member "kirchner" # Gruppen haben dann natuerlich deutsche Namen
+Add-LocalGroupMember -Group "Administratoren" -Member "stadthagen\put878" # Gruppen haben dann natuerlich deutsche Namen
 
 Add-LocalGroupMember -Group "Remotedesktopbenutzer" -Member "stadthagen\fel841" # working
 Add-LocalGroupMember -Group "Administratoren" -Member "stadthagen\fel841" # Gruppen haben dann natuerlich deutsche Namen
@@ -675,6 +676,7 @@ $user = [Security.Principal.WindowsIdentity]::GetCurrent()
 Get-LocalGroupMember -Group "Administratoren" # working
 
 Remove-LocalGroupMember -Group "Administratoren" -Member "stadthagen\domänen-benutzer"
+Remove-LocalGroupMember -Group "Administratoren" -Member "stadthagen\put878"
 
 ### rdp stuff
 Set-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 'fDenyTSConnections' -Type DWORD -Value 0 -Force
