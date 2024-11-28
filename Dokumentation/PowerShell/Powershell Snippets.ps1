@@ -119,7 +119,7 @@ if ( Test-Connection -ComputerName $_server_to_act_on -Count 1 -Quiet ) {}
 [bool](Invoke-Command -ComputerName "kgt-mi-hun868nb" -ScriptBlock {"hello from $env:COMPUTERNAME"} -ErrorAction SilentlyContinue)
 
 # Passwort von lokalem User ändern
-$Password = Read-Host -AsSecureS16tring
+$Password = Read-Host -AsSecureString
 $UserAccount = Get-LocalUser -Name "kirchner"
 $UserAccount | Set-LocalUser -Password $Password
 
