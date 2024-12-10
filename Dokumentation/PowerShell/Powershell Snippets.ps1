@@ -194,6 +194,7 @@ Disable-PnpDevice -InstanceId (Get-PnpDevice -PresentOnly | Where-Object { $_.Cl
 
 # reactivate the mouse
 Enable-PnpDevice -InstanceId (Get-PnpDevice -PresentOnly | Where-Object { $_.Class -eq 'Mouse' }).InstanceId -Confirm:$false
+Enable-PnpDevice -InstanceId (Get-PnpDevice -PresentOnly | Where-Object { $_.Class -eq 'keyboard' }).InstanceId -Confirm:$false
 
 
 
