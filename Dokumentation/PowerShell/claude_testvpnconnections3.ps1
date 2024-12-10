@@ -111,9 +111,6 @@ function Test-InterServerConnection {
 
 # Main Script Execution
 try {
-    # Redirect all output to both console and file
-    Start-Transcript -Path $OutputFile
-
     # Read servers from file
     $servers = Get-Content -Path $ServersFile -ErrorAction Stop
 
@@ -122,52 +119,80 @@ try {
         throw "At least two servers are required in the servers file."
     }
 
-    # Display script banner
-    Write-ColorHeader "Inter-Server VPN Connection Tester" "Cyan"
+    # Create a string builder to capture output
+    $outputContent = [System.Text.StringBuilder]::new()
+
+    # Capture script banner
+    $banner = $null
+    $oldOutput = $Host.UI.RawUI.ForegroundColor
+    try {
+        $Host.UI.RawUI.ForegroundColor = 'Cyan'
+        $banner = & {
+            Write-ColorHeader "Inter-Server VPN Connection Tester" "Cyan"
+        } 2>&1 | Out-String
+        $outputContent.AppendLine($banner)
+    }
+    finally {
+        $Host.UI.RawUI.ForegroundColor = $oldOutput
+    }
 
     # Results array to collect all connection tests
     $allResults = @()
     $allOutputLines = @()
 
-    # Test connections between all servers
-    for ($i = 0; $i -lt $servers.Count; $i++) {
-        for ($j = 0; $j -lt $servers.Count; $j++) {
-            if ($i -ne $j) {
-                # If $cred is defined externally, it will be used here
-                $resultTuple = Test-InterServerConnection -SourceServer $servers[$i] -DestServer $servers[$j] -PingCount $PingCount -Credential $cred
-                
-                # Ensure result is not null before adding
-                if ($resultTuple[0]) {
-                    $allResults += $resultTuple[0]
-                    $allOutputLines += $resultTuple[1]
+    # Redirect console output
+    $oldOut = $Host.UI.RawUI.ForegroundColor
+    try {
+        # Capture output for both console and file
+        $Host.UI.RawUI.ForegroundColor = 'Yellow'
+
+        # Test connections between all servers
+        for ($i = 0; $i -lt $servers.Count; $i++) {
+            for ($j = 0; $j -lt $servers.Count; $j++) {
+                if ($i -ne $j) {
+                    # If $cred is defined externally, it will be used here
+                    $resultTuple = Test-InterServerConnection -SourceServer $servers[$i] -DestServer $servers[$j] -PingCount $PingCount -Credential $cred
+                    
+                    # Ensure result is not null before adding
+                    if ($resultTuple[0]) {
+                        $allResults += $resultTuple[0]
+                        $outputContent.AppendLine($resultTuple[1])
+                    }
                 }
             }
         }
     }
+    finally {
+        $Host.UI.RawUI.ForegroundColor = $oldOut
+    }
 
     # Summary Statistics
-    Write-ColorHeader "Connection Summary" "Green"
-    $successfulPings = ($allResults | Where-Object { $_.Ping }).Count
-    $successfulWinRM = ($allResults | Where-Object { $_.WinRM }).Count
-    $totalTests = $allResults.Count
+    $summaryOutput = & {
+        Write-ColorHeader "Connection Summary" "Green"
+        $successfulPings = ($allResults | Where-Object { $_.Ping }).Count
+        $successfulWinRM = ($allResults | Where-Object { $_.WinRM }).Count
+        $totalTests = $allResults.Count
 
-    Write-Host "Total Connection Tests: " -NoNewline
-    Write-Host $totalTests -ForegroundColor Cyan
-    Write-Host "Successful Pings: " -NoNewline
-    Write-Host "$successfulPings / $totalTests" -ForegroundColor $(if($successfulPings -eq $totalTests){'Green'}else{'Yellow'})
-    Write-Host "Successful WinRM Connections: " -NoNewline
-    Write-Host "$successfulWinRM / $totalTests" -ForegroundColor $(if($successfulWinRM -eq $totalTests){'Green'}else{'Yellow'})
+        Write-Host "Total Connection Tests: " -NoNewline
+        Write-Host $totalTests -ForegroundColor Cyan
+        Write-Host "Successful Pings: " -NoNewline
+        Write-Host "$successfulPings / $totalTests" -ForegroundColor $(if($successfulPings -eq $totalTests){'Green'}else{'Yellow'})
+        Write-Host "Successful WinRM Connections: " -NoNewline
+        Write-Host "$successfulWinRM / $totalTests" -ForegroundColor $(if($successfulWinRM -eq $totalTests){'Green'}else{'Yellow'})
 
+        Write-Host "`nResults exported to: " -NoNewline
+        Write-Host $OutputFile -ForegroundColor Green
+    } 2>&1 | Out-String
+
+    # Add summary to output content
+    $outputContent.AppendLine($summaryOutput)
+
+    # Write output to file
+    $outputContent.ToString() | Out-File -FilePath $OutputFile -Encoding UTF8
     Write-Host "`nResults exported to: " -NoNewline
     Write-Host $OutputFile -ForegroundColor Green
-
-    # Stop transcript (which automatically saves the output)
-    Stop-Transcript
 }
 catch {
     Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "Error Details: $($_.ScriptStackTrace)" -ForegroundColor Red
-    
-    # Ensure transcript is stopped even if an error occurs
-    Stop-Transcript -ErrorAction SilentlyContinue
 }

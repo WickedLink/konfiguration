@@ -189,5 +189,11 @@ Get-ADOrganizationalUnit -Filter * # working
 Get-ADOrganizationalUnit -Filter * | Select-Object Name # working
 
 
+# deactivate the mouse
+Disable-PnpDevice -InstanceId (Get-PnpDevice -PresentOnly | Where-Object { $_.Class -eq 'Mouse' }).InstanceId -Confirm:$false
+
+# reactivate the mouse
+Enable-PnpDevice -InstanceId (Get-PnpDevice -PresentOnly | Where-Object { $_.Class -eq 'Mouse' }).InstanceId -Confirm:$false
+
 
 
