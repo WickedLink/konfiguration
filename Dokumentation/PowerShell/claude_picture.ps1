@@ -205,3 +205,40 @@ Invoke-Command -ComputerName kgt-mi-hun868nb -Credential $cred -ScriptBlock {
     }
 }
 
+###############################
+
+Add-Type @"
+    using System;
+    using System.Runtime.InteropServices;
+    public class Wallpaper {
+        public const int SPI_SETDESKWALLPAPER = 20;
+        public const int SPIF_UPDATEINIFILE = 0x01;
+        public const int SPIF_SENDWININICHANGE = 0x02;
+
+        [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
+        public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+
+        public static void Set(string path) {
+            SystemParametersInfo(SPI_SETDESKWALLPAPER, 0, path, SPIF_UPDATEINIFILE | SPIF_SENDWININICHANGE);
+        }
+    }
+"@
+
+
+$code = @"
+    [DllImport("user32.dll")]
+    public static extern int SystemParametersInfo(int uAction, int uParam, string lpvParam, int fuWinIni);
+"@
+
+Add-Type -MemberDefinition $code -Name WallpaperSetter -Namespace Win32Functions
+
+$SPI_SETDESKWALLPAPER = 20
+$SPIF_UPDATEINIFILE = 1
+$SPIF_SENDWININICHANGE = 2
+
+[Win32Functions.WallpaperSetter]::SystemParametersInfo(
+    $SPI_SETDESKWALLPAPER, 
+    0, 
+    $wallpaperPath, 
+    ($SPIF_UPDATEINIFILE -bor $SPIF_SENDWININICHANGE)
+)

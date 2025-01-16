@@ -1,6 +1,34 @@
 # Computer Group Membership Scanner
 # Scans computers from a list and retrieves local group memberships
 
+# Ensure verbose output
+$VerbosePreference = 'Continue'
+
+# Check and import necessary modules
+function Ensure-RequiredModules {
+    $modulesToCheck = @('ActiveDirectory', 'PSLogging')
+    
+    foreach ($module in $modulesToCheck) {
+        Write-Verbose "Checking for module: $module"
+        if (-not (Get-Module -ListAvailable -Name $module)) {
+            Write-Warning "Module $module is not installed. Attempting to install..."
+            try {
+                Install-Module -Name $module -Force -Scope CurrentUser
+                Import-Module -Name $module
+                Write-Verbose "Successfully installed and imported $module"
+            }
+            catch {
+                Write-Error "Failed to install module $module. Error: $_"
+            }
+        }
+        else {
+            Import-Module -Name $module
+            Write-Verbose "Module $module is already installed and imported"
+        }
+    }
+}
+
+# Main scanning function
 function Scan-ComputerGroups {
     param (
         [Parameter(Mandatory=$true)]
@@ -10,30 +38,36 @@ function Scan-ComputerGroups {
         [System.Management.Automation.PSCredential]$Credential
     )
 
-    # Remove any trailing ':' and trim whitespace
-    $ComputerName = $ComputerName.TrimEnd(':').Trim()
+    # Colorful output function
+    function Write-ColorOutput {
+        param(
+            [string]$Message,
+            [string]$Color = 'Green'
+        )
+        Write-Host $Message -ForegroundColor $Color
+    }
 
     # Initialize results array
     $computerResults = @()
 
     try {
         # Test connection
-        Write-Host "Testing connection to $ComputerName" -ForegroundColor Yellow
+        Write-Verbose "Testing connection to $ComputerName"
         if (-not (Test-Connection -ComputerName $ComputerName -Count 2 -Quiet)) {
-            Write-Host "❌ $ComputerName is not reachable" -ForegroundColor Red
+            Write-ColorOutput "❌ $ComputerName is not reachable" -Color 'Red'
             return $null
         }
-        Write-Host "✅ $ComputerName is reachable" -ForegroundColor Green
+        Write-ColorOutput "✅ $ComputerName is reachable" -Color 'Green'
 
         # Define the groups to check (in German)
         $groupsToCheck = @('Administratoren', 'Benutzer')
 
-        # Scan groups using Invoke-Command for remote execution
+        # Scan groups
         foreach ($group in $groupsToCheck) {
             try {
-                Write-Host "Retrieving members of group $group on $ComputerName" -ForegroundColor Yellow
+                Write-Verbose "Retrieving members of group $group on $ComputerName"
                 
-                # Use Invoke-Command to run locally on remote computer
+                # Use the credential if provided
                 $groupMembers = if ($Credential) {
                     Invoke-Command -ComputerName $ComputerName -Credential $Credential -ScriptBlock {
                         param($groupName)
@@ -41,10 +75,7 @@ function Scan-ComputerGroups {
                     } -ArgumentList $group
                 }
                 else {
-                    Invoke-Command -ComputerName $ComputerName -ScriptBlock {
-                        param($groupName)
-                        Get-LocalGroupMember -Group $groupName
-                    } -ArgumentList $group
+                    Get-LocalGroupMember -ComputerName $ComputerName -Group $group
                 }
 
                 # Process and store group members
@@ -57,15 +88,15 @@ function Scan-ComputerGroups {
                     }
                 }
 
-                Write-Host "📋 Found $($groupMembers.Count) members in $group group" -ForegroundColor Cyan
+                Write-ColorOutput "📋 Found $($groupMembers.Count) members in $group group" -Color 'Cyan'
             }
             catch {
-                Write-Host "❌ Error retrieving $group group: $($_.Exception.Message)" -ForegroundColor Red
+                Write-ColorOutput "❌ Error retrieving $group group: $($_.Exception.Message)" -Color 'Red'
             }
         }
     }
     catch {
-        Write-Host "❌ Unexpected error scanning ${ComputerName}: $($_.Exception.Message)" -ForegroundColor Red
+        Write-ColorOutput "❌ Unexpected error scanning ${ComputerName}: $($_.Exception.Message)" -Color 'Red'
     }
 
     return $computerResults
@@ -73,9 +104,12 @@ function Scan-ComputerGroups {
 
 # Main script execution
 function Main {
+    # Ensure required modules are imported
+    Ensure-RequiredModules
+
     # Read computer list
-    $computerList = Get-Content -Path "c:\inst\computerlist_all.txt"
-    Write-Host "Loaded $($computerList.Count) computers from computerlist_all.txt" -ForegroundColor Magenta
+    $computerList = Get-Content -Path "computerlist_all.txt"
+    Write-Verbose "Loaded $($computerList.Count) computers from computerlist_all.txt"
 
     # Prepare results collection
     $allResults = @()
@@ -95,7 +129,7 @@ function Main {
     # Export to CSV
     $outputPath = "computer_group_scan_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv"
     $allResults | Export-Csv -Path $outputPath -NoTypeInformation
-    Write-Host "💾 Results exported to $outputPath" -ForegroundColor Green
+    Write-ColorOutput "💾 Results exported to $outputPath" -Color 'Green'
 }
 
 # Run the main function

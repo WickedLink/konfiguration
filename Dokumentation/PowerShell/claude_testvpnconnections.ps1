@@ -1,14 +1,15 @@
 # VPN Connection Tester Script
 # Tests connectivity between multiple servers in both directions
-# Supports PowerShell 5 and 7
-
-Using module Microsoft.PowerShell.Utility
+# Supports PowerShell 7 or later
 
 param (
-    [string]$ServersFile = "c:\inst\computerlist_servers.txt",
-    [string]$OutputFile = "c:\inst\connection_results_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv",
-    [int]$PingCount = 2
+    [string]$ServersFile = "servers.txt",
+    [string]$OutputFile = "connection_results_$(Get-Date -Format 'yyyyMMdd_HHmmss').csv",
+    [int]$Timeout = 1000 # Ping timeout in milliseconds
 )
+
+# Import required modules
+Using module @{ModuleName='Microsoft.PowerShell.Utility';ModuleVersion='7.0.0.0'}
 
 # Function to create a colorful header
 function Write-ColorHeader {
@@ -23,12 +24,12 @@ function Write-ColorHeader {
     Write-Host $header -ForegroundColor DarkGray
 }
 
-# Function to test connection between servers
-function Test-InterServerConnection {
+# Function to test connection with verbose output
+function Test-ServerConnection {
     param(
         [string]$SourceServer,
         [string]$DestServer,
-        [int]$PingCount = 2,
+        [int]$Timeout = 1000,
         [System.Management.Automation.PSCredential]$Credential = $null
     )
 
@@ -38,68 +39,48 @@ function Test-InterServerConnection {
         Ping = $false
         PingTime = $null
         WinRM = $false
+        SMB = $false
         ErrorDetails = $null
     }
 
+    # Ping Test
     try {
-        # Use Invoke-Command to run connectivity tests from the source server
-        $testResult = Invoke-Command -ComputerName $SourceServer -Credential $Credential -ScriptBlock {
-            param($DestServer, $PingCount)
-            
-            $pingResults = @{
-                Ping = $false
-                PingTime = $null
-                WinRM = $false
-            }
-
-            # Ping Test
-            try {
-                $pingResult = Test-Connection -ComputerName $DestServer -Count $PingCount -ErrorAction Stop
-                $pingResults.Ping = $true
-                # Calculate average ping time
-                $pingResults.PingTime = ($pingResult | Measure-Object -Property ResponseTime -Average).Average
-            }
-            catch {
-                $pingResults.Ping = $false
-            }
-
-            # WinRM Test
-            try {
-                $winrmTest = Test-WSMan -ComputerName $DestServer -ErrorAction Stop
-                $pingResults.WinRM = $true
-            }
-            catch {
-                $pingResults.WinRM = $false
-            }
-
-            return $pingResults
-        } -ArgumentList $DestServer, $PingCount
-
-        # Update connection result with test results
-        $connectionResult.Ping = $testResult.Ping
-        $connectionResult.PingTime = $testResult.PingTime
-        $connectionResult.WinRM = $testResult.WinRM
-
-        # Verbose output
-        Write-Host "`nConnection Test: $SourceServer → $DestServer" -ForegroundColor Yellow
-        if ($testResult.Ping) {
-            Write-Host "✓ Ping successful: " -NoNewline -ForegroundColor Green
-            Write-Host "$($testResult.PingTime)ms" -ForegroundColor Cyan
-        } else {
-            Write-Host "✗ Ping failed" -ForegroundColor Red
-        }
-
-        if ($testResult.WinRM) {
-            Write-Host "✓ WinRM connection successful" -ForegroundColor Green
-        } else {
-            Write-Host "✗ WinRM connection failed" -ForegroundColor Red
-        }
+        $pingResult = Test-Connection -ComputerName $DestServer -Count 2 -Timeout $Timeout -ErrorAction Stop
+        $connectionResult.Ping = $true
+        $connectionResult.PingTime = $pingResult.Latency
+        
+        Write-Host "✓ Ping from $SourceServer to $DestServer: " -NoNewline -ForegroundColor Green
+        Write-Host "$($pingResult.Latency)ms" -ForegroundColor Cyan
     }
     catch {
-        Write-Host "✗ Error testing connection from $SourceServer to $DestServer" -ForegroundColor Red
+        Write-Host "✗ Ping from $SourceServer to $DestServer failed" -ForegroundColor Red
         $connectionResult.ErrorDetails = $_.Exception.Message
-        $connectionResult.Ping = $false
-        $connectionResult.WinRM = $false
+    }
+
+    # WinRM Test (if credentials provided)
+    if ($Credential) {
+        try {
+            $winrmSession = New-PSSession -ComputerName $DestServer -Credential $Credential -ErrorAction Stop
+            $connectionResult.WinRM = $true
+            Remove-PSSession $winrmSession
+            
+            Write-Host "✓ WinRM connection from $SourceServer to $DestServer successful" -ForegroundColor Green
+        }
+        catch {
+            Write-Host "✗ WinRM connection from $SourceServer to $DestServer failed" -ForegroundColor Red
+            $connectionResult.ErrorDetails = $_.Exception.Message
+        }
+    }
+
+    # SMB Test
+    try {
+        $smbTest = Get-SmbConnection -ServerName $DestServer -ErrorAction Stop
+        $connectionResult.SMB = $true
+        
+        Write-Host "✓ SMB connection from $SourceServer to $DestServer successful" -ForegroundColor Green
+    }
+    catch {
+        Write-Host "✗ SMB connection from $SourceServer to $DestServer failed" -ForegroundColor Red
     }
 
     return $connectionResult
@@ -116,7 +97,7 @@ try {
     }
 
     # Display script banner
-    Write-ColorHeader "Inter-Server VPN Connection Tester" "Cyan"
+    Write-ColorHeader "VPN Connection Tester" "Cyan"
 
     # Results array to collect all connection tests
     $allResults = @()
@@ -125,13 +106,11 @@ try {
     for ($i = 0; $i -lt $servers.Count; $i++) {
         for ($j = 0; $j -lt $servers.Count; $j++) {
             if ($i -ne $j) {
-                # If $cred is defined externally, it will be used here
-                $result = Test-InterServerConnection -SourceServer $servers[$i] -DestServer $servers[$j] -PingCount $PingCount -Credential $cred
+                Write-Host "`nTesting connection from $($servers[$i]) to $($servers[$j])" -ForegroundColor Yellow
                 
-                # Ensure result is not null before adding
-                if ($result) {
-                    $allResults += $result
-                }
+                # If $cred is defined externally, it will be used here
+                $result = Test-ServerConnection -SourceServer $servers[$i] -DestServer $servers[$j] -Timeout $Timeout -Credential $cred
+                $allResults += $result
             }
         }
     }
@@ -140,6 +119,7 @@ try {
     Write-ColorHeader "Connection Summary" "Green"
     $successfulPings = ($allResults | Where-Object { $_.Ping }).Count
     $successfulWinRM = ($allResults | Where-Object { $_.WinRM }).Count
+    $successfulSMB = ($allResults | Where-Object { $_.SMB }).Count
     $totalTests = $allResults.Count
 
     Write-Host "Total Connection Tests: " -NoNewline
@@ -148,6 +128,8 @@ try {
     Write-Host "$successfulPings / $totalTests" -ForegroundColor $(if($successfulPings -eq $totalTests){'Green'}else{'Yellow'})
     Write-Host "Successful WinRM Connections: " -NoNewline
     Write-Host "$successfulWinRM / $totalTests" -ForegroundColor $(if($successfulWinRM -eq $totalTests){'Green'}else{'Yellow'})
+    Write-Host "Successful SMB Connections: " -NoNewline
+    Write-Host "$successfulSMB / $totalTests" -ForegroundColor $(if($successfulSMB -eq $totalTests){'Green'}else{'Yellow'})
 
     # Export results to CSV
     $allResults | Export-Csv -Path $OutputFile -NoTypeInformation
@@ -156,5 +138,4 @@ try {
 }
 catch {
     Write-Host "Error: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "Error Details: $($_.ScriptStackTrace)" -ForegroundColor Red
 }
